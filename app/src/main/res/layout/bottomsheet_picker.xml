@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_white_top_rounded_16"
+    android:orientation="vertical"
+    android:padding="16dp"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="0dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/pickerTitle"
+        style="@style/workSansMedium"
+        android:layout_marginTop="8dp"
+        android:text="Select Date"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <NumberPicker
+                android:id="@+id/firstPicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:layout_weight="1"
+                android:showDividers="none"
+                android:theme="@style/DefaultTimePickerTheme" />
+
+            <NumberPicker
+                android:id="@+id/secondPicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:layout_weight="1"
+                android:showDividers="none"
+                android:theme="@style/DefaultTimePickerTheme" />
+
+            <NumberPicker
+                android:id="@+id/thirdPicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:showDividers="none"
+                android:theme="@style/DefaultTimePickerTheme" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            style="@style/Devider"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            style="@style/Devider"
+            android:layout_marginTop="48dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/apply_button"
+        style="@style/primaryButton"
+        android:layout_marginTop="48dp"
+        android:enabled="true"
+        android:text="@string/apply_label" />
+
+</LinearLayout>

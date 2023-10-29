@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/menuFragment">
+
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.jhy.project.schoollibrary.feature.main.MainMenuFragment"
+        tools:layout="@layout/fragment_menu">
+        <action
+            android:id="@+id/action_to_profileFragment"
+            app:destination="@+id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/schoolProfileFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.schoolprofile.SchoolProfileFragment"
+        android:label=" "
+        tools:layout="@layout/fragment_school_profile">
+        <deepLink app:uri="sekolahdigital://home/school-profile" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/schoolPrestasiFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.prestasi.SchoolPrestasiFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/school-prestasi" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/kbmFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.kbm.KBMFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/kbm" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/saFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.siswaalumni.SAFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/siswa-alumni" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fasilityFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.fasilitas.FasilitasFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/fasilitas" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/organisasiFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.organisasi.OrganisasiFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/organisasi" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/extraFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.extra.ExtraFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/ekstrakurikuler" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/galleryFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.galeri.GalleryFragment"
+        android:label=" ">
+        <deepLink app:uri="sekolahdigital://home/gallery" />
+
+        <action
+            android:id="@+id/action_to_addGalleryFragment"
+            app:destination="@id/addGalleryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addGalleryFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.galeri.add.AddGalleryFragment"
+        android:label="Tambah Album" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.home.HomeFragment"
+        android:label="Perpustakaan"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_to_detailBookFragment"
+            app:destination="@+id/detailBookFragment" />
+
+        <action
+            android:id="@+id/action_to_addEditBookFragment"
+            app:destination="@+id/addEditBookFragment" />
+
+        <action
+            android:id="@+id/action_to_daftarPenggunaFragment"
+            app:destination="@+id/penggunaFragment" />
+
+        <action
+            android:id="@+id/action_to_bookPinjamFragment"
+            app:destination="@+id/bookPinjamFragment" />
+
+        <action
+            android:id="@+id/action_to_pinjamFragment"
+            app:destination="@+id/pinjamFragment" />
+
+        <action
+            android:id="@+id/action_to_libVisitFragment"
+            app:destination="@+id/libVisitFragment" />
+
+        <deepLink app:uri="sekolahdigital://home/perpustakaan" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.jhy.project.schoollibrary.feature.profile.ProfileFragment"
+        android:label="Profil"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/detailBookFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.book.BookDetailFragment"
+        android:label="Detail buku"
+        tools:layout="@layout/fragment_book_detail">
+        <argument
+            android:name="key"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_to_addEditBookFragment"
+            app:destination="@+id/addEditBookFragment" />
+        <action
+            android:id="@+id/action_to_pinjamFragment"
+            app:destination="@+id/pinjamFragment" />
+        <action
+            android:id="@+id/action_to_bookPinjamFragment"
+            app:destination="@+id/bookPinjamFragment" />
+        <action
+            android:id="@+id/action_to_bookReadPdfFragment"
+            app:destination="@+id/bookReadPdfFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookReadPdfFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.book.BookReadPdfFragment"
+        android:label="Baca buku"
+        tools:layout="@layout/fragment_book_read_pdf">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditBookFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.book.BookAddEditFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_book_add_edit">
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="book"
+            app:argType="com.jhy.project.schoollibrary.model.Book"
+            app:nullable="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookPinjamFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.book.BookPinjamFragment"
+        android:label="Pinjam Buku"
+        tools:layout="@layout/fragment_book_pinjam">
+        <argument
+            android:name="book"
+            android:defaultValue="@null"
+            app:argType="com.jhy.project.schoollibrary.model.Book"
+            app:nullable="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/penggunaFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.user.UsersFragment"
+        android:label="Daftar Pengguna Pustaka"
+        tools:layout="@layout/fragment_users">
+        <action
+            android:id="@+id/action_to_userAddEditFragment"
+            app:destination="@+id/userAddEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/userAddEditFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.user.UserAddEditFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_user_add_edit">
+
+        <argument
+            android:name="title"
+            app:argType="string" />
+
+        <argument
+            android:name="type"
+            app:argType="string" />
+
+        <argument
+            android:name="user"
+            android:defaultValue="@null"
+            app:argType="com.jhy.project.schoollibrary.model.User"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_to_pinjamFragment"
+            app:destination="@+id/pinjamFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pinjamFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.pinjam.PinjamFragment"
+        android:label="Daftar Pinjam Buku"
+        tools:layout="@layout/fragment_pinjam">
+        <argument
+            android:name="ukey"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="bkey"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/libVisitFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.visit.LibVisitFragment"
+        android:label="Daftar Kunjungan" />
+
+    <fragment
+        android:id="@+id/simpleWebFragment"
+        android:name="com.jhy.project.schoollibrary.component.SimpleWebFragment"
+        android:label=" "
+        tools:layout="@layout/fragment_simple_web">
+        <argument
+            android:name="image"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="title"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="content"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <deepLink app:uri="sekolahdigital://simple-web?image={image}&amp;title={title}&amp;content={content}" />
+    </fragment>
+
+</navigation>

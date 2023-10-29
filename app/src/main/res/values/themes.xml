@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_white_top_rounded_16</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+        <item name="colorControlNormal">@color/neutral_40</item>
+        <item name="colorControlActivated">@color/neutral_40</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorPrimaryDark">@color/primary_color</item>
+        <item name="colorAccent">@color/primary_color</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlActivated">@color/black</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:autofilledHighlight" tools:targetApi="o">@color/transparent</item>
+    </style>
+
+    <style name="AppTheme.noActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@color/full_bg_color</item>
+        <item name="colorPrimary">@color/full_bg_color</item>
+        <item name="colorPrimaryDark">@color/full_bg_color</item>
+        <item name="colorAccent">@color/full_bg_color</item>
+        <item name="android:statusBarColor">@color/full_bg_color</item>
+    </style>
+
+    <style name="FullDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:background">#80FFFFFF</item>
+        <item name="android:statusBarColor">@color/full_bg_color</item>
+    </style>
+
+    <style name="DefaultTimePickerTheme" parent="AppTheme">
+        <item name="colorControlNormal">@color/transparent</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/transparent</item>
+        <item name="android:fontFamily">@font/work_sans_medium</item>
+    </style>
+</resources>

@@ -1,0 +1,79 @@
+<resources>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up_dialog</item>
+        <item name="android:windowExitAnimation">@anim/slide_down_dialog</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="customTextView" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:lineSpacingExtra">1.5dp</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="workSansRegular" parent="customTextView">
+        <item name="android:fontFamily">@font/work_sans_regular</item>
+    </style>
+
+    <style name="workSansMedium" parent="customTextView">
+        <item name="android:fontFamily">@font/work_sans_medium</item>
+    </style>
+
+    <style name="workSansSemiBold" parent="customTextView">
+        <item name="android:fontFamily">@font/work_sans_semibold</item>
+    </style>
+
+    <style name="workSansBold" parent="customTextView">
+        <item name="android:fontFamily">@font/work_sans_bold</item>
+    </style>
+
+    <style name="Devider" parent="AppTheme.noActionBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#E2E7EF</item>
+    </style>
+
+    <style name="TopViewBottomSheet" parent="AppTheme.noActionBar">
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">4dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/bg_grey_ef_16</item>
+    </style>
+
+    <style name="customEditText" parent="TextAppearance.AppCompat">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:textSize">@dimen/text_normal</item>
+        <item name="android:textColor">@color/neutral_40</item>
+        <item name="android:fontFamily">@font/work_sans_regular</item>
+        <item name="android:background">@drawable/background_border_rounded_primary_20</item>
+    </style>
+
+    <style name="normalButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">@dimen/text_normal</item>
+    </style>
+
+    <style name="primaryButton" parent="normalButton">
+        <item name="android:background">@drawable/background_rounded_primary_20</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/work_sans_medium</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- for text -->
+    <style name="AppTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">16sp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:fontFamily">@font/work_sans_semibold</item>
+    </style>
+
+</resources>

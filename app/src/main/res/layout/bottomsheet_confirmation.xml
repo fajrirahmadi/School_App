@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    app:behavior_hideable="false"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <View
+        android:layout_width="56dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_grey_ef_16" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title_tv"
+        style="@style/workSansMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="Konfirmasi"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/description_tv"
+        style="@style/workSansRegular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="Apakah Anda yakin ingin keluar dari aplikasi?"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/yes_button"
+            style="@style/primaryButton"
+            android:layout_marginTop="32dp"
+            android:layout_weight="1"
+            android:background="@drawable/background_border_rounded_primary_20"
+            android:elevation="0dp"
+            android:text="Ya"
+            android:textColor="@color/black" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/no_button"
+            style="@style/primaryButton"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_weight="1"
+            android:text="Tidak" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

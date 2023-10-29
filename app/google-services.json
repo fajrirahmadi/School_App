@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "171560172783",
+    "project_id": "school-library-d7c6d",
+    "storage_bucket": "school-library-d7c6d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171560172783:android:41884a89ba6f2830ac6f1a",
+        "android_client_info": {
+          "package_name": "com.jhy.project.schoollibrary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "171560172783-httkbo0j16h336dgrcsft8kco9fusev9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jhy.project.schoollibrary",
+            "certificate_hash": "0ed4fac489c25af2ffd7cc8ab703fb8f589096ae"
+          }
+        },
+        {
+          "client_id": "171560172783-gbne5mdc1s6pg09mi9pmb7lgcj9h5037.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbzPk5TOF4kVpWS-CtlXtDd9qlMFrljNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "171560172783-gbne5mdc1s6pg09mi9pmb7lgcj9h5037.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

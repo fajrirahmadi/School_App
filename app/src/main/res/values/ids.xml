@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="book_type" type="id" />
+    <item name="filter_type" type="id" />
+    <item name="home_menu_type" type="id" />
+    <item name="key_value_type" type="id" />
+    <item name="pengguna_type" type="id" />
+    <item name="pinjam_buku_type" type="id" />
+    <item name="profile_menu_type" type="id" />
+    <item name="book_category_type" type="id" />
+    <item name="kelas_kategori_type" type="id" />
+    <item name="library_menu_type" type="id" />
+    <item name="banner_type" type="id" />
+    <item name="article_type" type="id" />
+</resources>

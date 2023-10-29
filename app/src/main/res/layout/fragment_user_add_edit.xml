@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="32dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/btn_submit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/pinjam_btn"
+                    style="@style/primaryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_rounded_primary_20"
+                    android:gravity="center"
+                    android:text="@string/daftar_pinjam"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cetak_btn"
+                    style="@style/primaryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_rounded_primary_20"
+                    android:gravity="center"
+                    android:text="@string/bebas_pustaka"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/workSansMedium"
+                android:layout_marginTop="32dp"
+                android:text="@string/nama" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/name_et"
+                style="@style/customEditText"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_border_rounded_primary_20"
+                android:hint="@string/nama"
+                android:paddingStart="@dimen/margin_medium"
+                android:paddingEnd="@dimen/margin_medium"
+                android:singleLine="true"
+                android:textSize="@dimen/text_medium" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/workSansMedium"
+                android:layout_marginTop="24dp"
+                android:text="@string/nomor_identitas" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/id_et"
+                style="@style/customEditText"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_border_rounded_primary_20"
+                android:hint="@string/nomor_identitas"
+                android:inputType="number"
+                android:paddingStart="@dimen/margin_medium"
+                android:paddingEnd="@dimen/margin_medium"
+                android:singleLine="true"
+                android:textSize="@dimen/text_medium" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/kelas_label"
+                style="@style/workSansMedium"
+                android:layout_marginTop="24dp"
+                android:text="@string/kelas" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/kelas_et"
+                style="@style/customEditText"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_border_rounded_primary_20"
+                android:drawableEnd="@drawable/ic_down_primary"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:hint="@string/kelas"
+                android:inputType="number"
+                android:paddingStart="@dimen/margin_medium"
+                android:paddingEnd="@dimen/margin_medium"
+                android:singleLine="true"
+                android:textSize="@dimen/text_medium" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/workSansMedium"
+                android:layout_marginTop="24dp"
+                android:text="@string/jenis_kelamin" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/pria_btn"
+                    style="@style/primaryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selector_primary_20"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:text="@string/pria"
+                    android:textAllCaps="false"
+                    android:textColor="@color/selector_text_primary_white"
+                    android:textSize="14sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/wanita_btn"
+                    style="@style/primaryButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selector_primary_20"
+                    android:gravity="center"
+                    android:text="@string/wanita"
+                    android:textAllCaps="false"
+                    android:textColor="@color/selector_text_primary_white"
+                    android:textSize="14sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btn_submit"
+        style="@style/primaryButton"
+        android:layout_marginTop="72dp"
+        android:gravity="center"
+        android:text="@string/submit"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

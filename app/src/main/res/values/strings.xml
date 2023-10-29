@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">SMPN 1 Painan</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="label_home">Home</string>
+    <string name="label_history">History</string>
+    <string name="label_profile">Profile</string>
+    <string name="password">Kata Sandi</string>
+    <string name="label_daftar_sekarang">Daftar Sekarang</string>
+    <string name="create_new_account">Belum memiliki akun?</string>
+    <string name="masuk_dengan_google">Masuk dengan google</string>
+    <string name="forget_password">Lupa kata sandi?</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="silahkan_masukkan_email_dari_akun_anda_reset_password_akan_dikirimkan_ke_email_anda">Silakan masukkan email dari akun Anda, link reset kata sandi akan dikirimkan ke email Anda.</string>
+    <string name="submit">Submit</string>
+    <string name="nama">Nama</string>
+    <string name="confirm_password">Konfirmasi kata sandi</string>
+    <string name="judul_buku">Judul Buku</string>
+    <string name="kategori_buku">Kategori Buku</string>
+    <string name="penerbit">Penerbit</string>
+    <string name="tahun_terbit">Tahun Terbit</string>
+    <string name="pengarang">Pengarang</string>
+    <string name="isbn">Isbn</string>
+    <string name="apply_label">Terapkan</string>
+    <string name="stok">Stok Buku</string>
+    <string name="daftar_pinjam">Daftar Pinjam</string>
+    <string name="pinjam_buku">Pinjam Buku</string>
+    <string name="ubah">Ubah</string>
+    <string name="nomor_identitas">Nomor Identitas</string>
+    <string name="pria">Pria</string>
+    <string name="wanita">Wanita</string>
+    <string name="jenis_kelamin">Jenis Kelamin</string>
+    <string name="buku_dipinjam">Buku yang dipinjam</string>
+    <string name="tambah_buku">Tambah Buku</string>
+    <string name="tanggal_peminjamanT">Tanggal Peminjaman</string>
+    <string name="tanggal_peminjaman">Tanggal peminjaman</string>
+    <string name="nip">NIP / NIS</string>
+    <string name="kelas">Kelas</string>
+    <string name="bebas_pustaka">Cetak Bebas Pustaka</string>
+    <string name="delete">Hapus</string>
+    <string name="jumlah_halaman">Jumlah Halaman</string>
+    <string name="download_book">Download PDF</string>
+    <string name="baca_buku">Baca Online</string>
+    <string name="tanggal_pengembalian">Tanggal Pengembalian</string>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <RelativeLayout
+        android:layout_width="80dp"
+        android:layout_height="80dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/profile_iv"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/circle_primary"
+            android:scaleType="fitXY" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/add_photo_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/circle_gray"
+            android:padding="4dp"
+            android:src="@drawable/ic_add" />
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/name_tv"
+        style="@style/workSansMedium"
+        android:layout_marginTop="16dp"
+        android:text="Fajri Rahmadi"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/id_tv"
+        style="@style/workSansRegular"
+        android:layout_marginTop="8dp"
+        android:text="NIS: 19092" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

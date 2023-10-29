@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/cover_iv"
+            android:layout_width="80dp"
+            android:layout_height="120dp"
+            android:src="@drawable/background_rounded_primary_20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cover_iv"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/judul_tv"
+                style="@style/workSansMedium"
+                android:text="Habis gelap terbitlah terang"
+                android:textColor="@color/primary_color"
+                android:textSize="18sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/code_tv"
+                style="@style/workSansRegular"
+                android:layout_marginTop="8dp"
+                android:text="Kode Buku: 005" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/peminjam_tv"
+                style="@style/workSansRegular"
+                android:layout_marginTop="8dp"
+                android:text="Dipinjam oleh: Fajri Rahmadi" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/date_tv"
+                style="@style/workSansRegular"
+                android:layout_marginTop="8dp"
+                android:text="Tgl pinjam  : 22-11-2022, 18:00" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/return_date_tv"
+                style="@style/workSansRegular"
+                android:layout_marginTop="8dp"
+                android:text="Tgl kembali : 22-11-2022, 18:00" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/denda_tv"
+                style="@style/workSansRegular"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/red"
+                android:text="Denda: Rp. 1.000" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/status_tv"
+                style="@style/workSansRegular"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/background_border_rounded_primary_20"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp"
+                android:text="Dipinjam" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        style="@style/Devider"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

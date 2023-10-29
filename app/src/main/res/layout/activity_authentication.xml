@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".auth.AuthActivity">
+
+    <FrameLayout
+        android:id="@+id/contailer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/auth_title_text_view"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/work_sans_medium"
+            android:gravity="center"
+            android:maxLines="1"
+            android:minLines="1"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/auth_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:titleTextColor="@android:color/transparent" />
+
+    </FrameLayout>
+
+    <fragment
+        android:id="@+id/fragmentAuthNavHost"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:defaultNavHost="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:navGraph="@navigation/nav_auth" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

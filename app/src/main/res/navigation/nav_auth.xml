@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_auth"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.jhy.project.schoollibrary.auth.LoginFragment"
+        android:label=" "
+        tools:layout="@layout/fragment_auth_login">
+
+        <action
+            android:id="@+id/action_to_registrationFragment"
+            app:destination="@+id/registrationFragment" />
+
+        <action
+            android:id="@+id/action_to_forgetPasswordFragment"
+            app:destination="@+id/forgetPasswordFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.jhy.project.schoollibrary.auth.RegistrationFragment"
+        android:label="Registration"
+        tools:layout="@layout/fragment_auth_registrasi" />
+
+    <fragment
+        android:id="@+id/forgetPasswordFragment"
+        android:name="com.jhy.project.schoollibrary.auth.ForgetPasswordFragment"
+        android:label="Lupa Kata Sandi"
+        tools:layout="@layout/fragment_auth_forget_password" />
+</navigation>
