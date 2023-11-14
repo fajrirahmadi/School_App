@@ -10,16 +10,14 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.jhy.project.schoollibrary.R
-import com.jhy.project.schoollibrary.auth.AuthActivity
 import com.jhy.project.schoollibrary.base.BaseViewBindingFragment
 import com.jhy.project.schoollibrary.component.ConfirmationBottomSheet
-import com.jhy.project.schoollibrary.component.WebViewActivity
 import com.jhy.project.schoollibrary.component.confirmationBottomSheet
 import com.jhy.project.schoollibrary.databinding.FragmentProfileBinding
 import com.jhy.project.schoollibrary.extension.initVerticalAdapter
 import com.jhy.project.schoollibrary.extension.setImage
+import com.jhy.project.schoollibrary.feature.MainActivity
 import com.jhy.project.schoollibrary.model.ProfileMenu
-import com.jhy.project.schoollibrary.model.constant.Constant
 import com.jhy.project.schoollibrary.model.siswa
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -102,7 +100,7 @@ class ProfileFragment : BaseViewBindingFragment<FragmentProfileBinding>() {
                 postDelayed({
                     val intent = Intent(
                         requireActivity(),
-                        AuthActivity::class.java
+                        MainActivity::class.java
                     )
                     intent.flags =
                         (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

@@ -4,7 +4,11 @@ import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.UploadTask
@@ -12,14 +16,33 @@ import com.google.firebase.storage.ktx.storage
 import com.jhy.project.schoollibrary.extension.generateKeyword
 import com.jhy.project.schoollibrary.extension.roundUpToNearestThousand
 import com.jhy.project.schoollibrary.extension.toDateFormat
-import com.jhy.project.schoollibrary.model.*
+import com.jhy.project.schoollibrary.model.Absence
+import com.jhy.project.schoollibrary.model.Article
+import com.jhy.project.schoollibrary.model.Book
+import com.jhy.project.schoollibrary.model.Event
+import com.jhy.project.schoollibrary.model.Gallery
+import com.jhy.project.schoollibrary.model.HomeMenu
+import com.jhy.project.schoollibrary.model.HomeModel
+import com.jhy.project.schoollibrary.model.Jadwal
+import com.jhy.project.schoollibrary.model.Kelas
+import com.jhy.project.schoollibrary.model.Mapel
+import com.jhy.project.schoollibrary.model.PinjamBuku
+import com.jhy.project.schoollibrary.model.SchoolExtraModel
+import com.jhy.project.schoollibrary.model.SchoolFacilityModel
+import com.jhy.project.schoollibrary.model.SchoolOrganisasiModel
+import com.jhy.project.schoollibrary.model.SchoolPrestasi
+import com.jhy.project.schoollibrary.model.User
+import com.jhy.project.schoollibrary.model.Visitor
 import com.jhy.project.schoollibrary.model.adapter.BookAdapter
+import com.jhy.project.schoollibrary.model.selesai
+import com.jhy.project.schoollibrary.model.toKelasRequest
 import java.io.File
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
 const val userDb = "user"
+const val accountDb = "accountDb"
 const val bookDb = "book"
 const val pinjamBukuDb = "pinjamBuku"
 const val counterDb = "counterDb"
@@ -32,6 +55,10 @@ const val mapelDb = "mapelDb"
 const val jadwalDb = "jadwalDb"
 const val galleryDb = "galleryDb"
 const val visitorDb = "visitorDb"
+const val visitorCountDb = "visitorCountDb"
+const val absenceDb = "absenceDb"
+const val asesmenDb = "asesmenDb"
+const val eventDb = "eventDb"
 
 @Singleton
 class FirebaseRepository @Inject constructor() {
@@ -65,17 +92,38 @@ class FirebaseRepository @Inject constructor() {
         return _db.collection(userDb).document(getUid()).set(user)
     }
 
-    fun updateUser(user: User): Task<Void> {
-        return _db.collection(userDb).document(user.key ?: "").set(user)
+    fun updateUser(user: User, pw: String? = null, currentKey: String? = null): Task<Void> {
+        val batch = _db.batch()
+        val userRef = _db.collection(userDb).document(user.key ?: "")
+        val authRef = _db.collection(userDb).document(user.key ?: "").collection("account")
+            .document("account01")
+
+        batch.set(userRef, user)
+        pw?.let {
+            batch.set(
+                authRef, mapOf(
+                    "email" to user.email, "password" to pw
+                )
+            )
+        }
+        currentKey?.let {
+            val oldUserRef = _db.collection(userDb).document(it)
+            batch.delete(oldUserRef)
+        }
+
+        return batch.commit()
     }
 
-    fun loadUser(): Task<DocumentSnapshot> {
-        return _db.collection(userDb).document(getUid()).get()
+    fun loadUser(key: String? = null, online: Boolean): Task<DocumentSnapshot> {
+        return _db.collection(userDb).document(key ?: getUid()).get(source(online))
     }
 
     fun loadUserList(word: String = "", limit: Long = 50): Task<QuerySnapshot> {
+        return _db.collection(userDb).whereEqualTo("role", "alumni").get()
         if (word.isNotBlank()) {
-            return _db.collection(userDb).whereArrayContains("words", word).orderBy("name")
+            return _db.collection(userDb)
+                .whereArrayContains("words", word)
+                .orderBy("name")
                 .limit(limit).get()
         }
         return _db.collection(userDb).orderBy("name").limit(limit).get()
@@ -85,16 +133,27 @@ class FirebaseRepository @Inject constructor() {
         type: String, classParams: String = "", keyword: String = "", limit: Long = 1000
     ): Task<QuerySnapshot> {
         if (keyword.isNotBlank()) {
+            if (classParams.isNotEmpty()) {
+                return _db.collection(userDb).whereEqualTo("role", type)
+                    .whereEqualTo("kelas", classParams.toKelasRequest())
+                    .whereArrayContains("words", keyword.lowercase()).orderBy("name").limit(limit)
+                    .get()
+            }
             return _db.collection(userDb).whereEqualTo("role", type)
-                .whereEqualTo("kelas", classParams.replace(".", "_"))
                 .whereArrayContains("words", keyword.lowercase()).orderBy("name").limit(limit).get()
         }
         if (classParams.isNotBlank()) {
             return _db.collection(userDb).whereEqualTo("role", type)
-                .whereEqualTo("kelas", classParams.replace(".", "_")).orderBy("name").limit(limit)
+                .whereEqualTo("kelas", classParams.toKelasRequest())
+                .orderBy("name")
+                .limit(limit)
                 .get()
         }
         return _db.collection(userDb).whereEqualTo("role", type).orderBy("name").limit(limit).get()
+    }
+
+    fun loadUserByClass(listOfClass: List<String>): Task<QuerySnapshot> {
+        return _db.collection(userDb).whereIn("kelas", listOfClass).get()
     }
 
     fun deleteUser() {
@@ -298,9 +357,8 @@ class FirebaseRepository @Inject constructor() {
         return _db.collection(mapelDb).whereArrayContains("kelas", kelas).get()
     }
 
-    fun submitMapel(mapel: Mapel) {
-        mapel.key = _db.collection(mapelDb).document().id
-        _db.collection(mapelDb).document(mapel.key).set(mapel)
+    fun submitMapel(mapel: Mapel): Task<Void> {
+        return _db.collection(mapelDb).document(mapel.key).set(mapel)
     }
 
     fun submitJadwal(jadwal: Jadwal) {
@@ -363,27 +421,102 @@ class FirebaseRepository @Inject constructor() {
             .orderBy("date", Query.Direction.DESCENDING).get(source(online))
     }
 
-    fun submitVisitor(visitor: Kunjungan): Task<Void> {
+    fun submitVisitor(visitor: Visitor): Task<Void> {
         visitor.key = _db.collection(visitorDb).document().id
+        val countKey = System.currentTimeMillis().toDateFormat("yyyy-MM")
 
         val batch = _db.batch()
         val visitorRef = _db.collection(visitorDb).document(visitor.key)
-        val counterRef = _db.collection(counterDb).document("libVisitor")
+        val counterRef = _db.collection(visitorCountDb).document(countKey)
 
         batch.set(visitorRef, visitor)
         batch.update(
             counterRef, mapOf(
-                "total_visitor" to FieldValue.increment(1),
-                "total_daily.${
-                    System.currentTimeMillis().toDateFormat("yyyy-MM-dd")
+                "totalVisitor" to FieldValue.increment(1), "totalDaily.${
+                    System.currentTimeMillis().toDateFormat("dd")
                 }" to FieldValue.increment(1)
             )
         )
-        return _db.collection(visitorDb).document(visitor.key).set(visitor)
+        return batch.commit()
     }
 
     fun searchUserByNis(nis: String): Task<QuerySnapshot> {
         return _db.collection(userDb).whereEqualTo("no_id", nis).get()
+    }
+
+    fun loadDailyVisitorCounter(
+        online: Boolean, date: Long = System.currentTimeMillis()
+    ): Task<DocumentSnapshot> {
+        val countKey = date.toDateFormat("yyyy-MM")
+        return _db.collection(visitorCountDb).document(countKey).get(source(online))
+    }
+
+    fun updateUserByNis(key: String, updatedData: Map<String, String>): Task<Void> {
+        return _db.collection(userDb).document(key).update(updatedData)
+    }
+
+    fun getUserByNis(nis: String): Task<QuerySnapshot> {
+        return _db.collection(userDb).whereEqualTo("no_id", nis).get()
+    }
+
+    fun removeVisitRecord(visitor: Visitor): Task<Void> {
+        val countKey = visitor.date.toDateFormat("yyyy-MM")
+        val batch = _db.batch()
+        val visitorRef = _db.collection(visitorDb).document(visitor.key)
+        val counterRef = _db.collection(visitorCountDb).document(countKey)
+
+        batch.delete(visitorRef)
+        batch.update(
+            counterRef, mapOf(
+                "totalVisitor" to FieldValue.increment(-1), "totalDaily.${
+                    System.currentTimeMillis().toDateFormat("dd")
+                }" to FieldValue.increment(-1)
+            )
+        )
+        return batch.commit()
+    }
+
+    fun loadJadwalByCode(day: String, kode: String): Task<QuerySnapshot> {
+        return _db.collection(jadwalDb).whereEqualTo("day", day.lowercase())
+            .whereEqualTo("kode", kode).orderBy("jam").get()
+    }
+
+    fun loadUserByKode(kode: String): Task<QuerySnapshot> {
+        return _db.collection(userDb).whereEqualTo("kode", kode).get()
+    }
+
+    fun loadMapelByCode(key: String): Task<DocumentSnapshot> {
+        return _db.collection(mapelDb).document(key).get()
+    }
+
+    fun submitAbsence(absence: Absence): Task<Void> {
+        absence.key = absence.key.ifEmpty { _db.collection(absenceDb).document().id }
+        return _db.collection(absenceDb).document(absence.key).set(absence)
+    }
+
+    fun loadAbsence(filter: String): Task<QuerySnapshot> {
+        return _db.collection(absenceDb).whereArrayContains("words", filter).get()
+    }
+
+    fun loadAbsenceByKey(key: String): Task<DocumentSnapshot> {
+        return _db.collection(absenceDb).document(key).get()
+    }
+
+    fun loadAsesment(filter: String): Task<QuerySnapshot> {
+        return _db.collection(asesmenDb).whereArrayContains("words", filter).get()
+    }
+
+    fun loadEventMyMonth(filter: String): Task<QuerySnapshot> {
+        return _db.collection(eventDb).whereArrayContains("filters", filter).get()
+    }
+
+    fun submitEvent(event: Event): Task<Void> {
+        event.key = _db.collection(eventDb).document().id
+        return _db.collection(eventDb).document(event.key).set(event)
+    }
+
+    fun updateArticle(key: String, mapOf: Map<String, String>) {
+        _db.collection(articleDb).document(key).update(mapOf)
     }
 
 }

@@ -35,7 +35,7 @@
 
     </FrameLayout>
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentNavHost"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
@@ -45,17 +45,23 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_main" />
 
+    <View
+        style="@style/Devider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
-        style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:itemIconTint="@color/primary_color"
+        android:layout_gravity="bottom"
+        android:paddingTop="5dp"
+        app:backgroundTint="@color/white"
+        app:elevation="0dp"
+        app:itemIconTint="@color/gray57"
         app:itemRippleColor="@null"
-        android:visibility="gone"
-        app:itemTextColor="@color/primary_color"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:itemTextColor="@color/gray57"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/menu_main" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

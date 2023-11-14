@@ -1,15 +1,18 @@
 package com.jhy.project.schoollibrary.model
 
+import java.io.Serializable
+
 data class Mapel(
     var key: String = "",
     var name: String = "",
-    var code: String = "",
-    var kelas: List<String> = emptyList(),
     var guru: String = "",
+    var kode: String = "",
     var nip: String = "",
+    var kelas: List<String> = emptyList(),
     var tahun: String = "",
+    var semester: String = "",
     var created: Long = System.currentTimeMillis()
-)
+): Serializable
 
 data class Jadwal(
     var key: String = "",
@@ -20,5 +23,6 @@ data class Jadwal(
     var mapel: String = "",
     var guru: String = "",
     var jam: Int = 0,
-    var actualJam: String = ""
+    var actualJam: String = "",
+    var kode: String = ""
 )

@@ -10,4 +10,6 @@ object AppColor {
     val greenSoft = Color(0xFFE5FFDF)
     val orangeSoft = Color(0xFFFAF4EA)
     val pinkSoft = Color(0xFFF4DEEB)
+    val grey = Color(0xFFA1A1A1)
+    val red = Color(0xFFCC0E0E)
 }

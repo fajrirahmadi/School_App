@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.jhy.project.schoollibrary.R
@@ -83,7 +84,9 @@ fun WorkSandTextNormal(
     text: String,
     color: Color = AppColor.neutral40,
     size: TextUnit = 14.sp,
-    textAlign: TextAlign = TextAlign.Left
+    textAlign: TextAlign = TextAlign.Left,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip
 ) {
     Text(
         modifier = modifier,
@@ -93,7 +96,9 @@ fun WorkSandTextNormal(
         fontWeight = FontWeight.Normal,
         fontSize = size,
         textAlign = textAlign,
-        lineHeight = 24.sp
+        lineHeight = 24.sp,
+        maxLines = maxLines,
+        overflow = overflow
     )
 }
 

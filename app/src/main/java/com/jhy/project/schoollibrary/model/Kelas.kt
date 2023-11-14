@@ -12,3 +12,11 @@ data class Kelas(
     var tahun: String = "",
     var order: Int = 0
 )
+
+fun String.toKelasText(): String {
+    return this.uppercase().replace(".", " ").replace("_", " ")
+}
+
+fun String.toKelasRequest(): String {
+    return this.uppercase().replace(" ", "_").replace(".", "_")
+}

@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.jhy.project.schoollibrary.R
+import com.jhy.project.schoollibrary.constanta.Navigation
 import com.jhy.project.schoollibrary.databinding.AdapterHomeMenuBinding
+import com.jhy.project.schoollibrary.repository.pinjamBukuDb
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 data class LibraryMenuAdapter(
@@ -39,9 +41,9 @@ data class LibraryMenuAdapter(
 
 }
 
-enum class LibraryMenu(val icon: Int, val title: String) {
-    PinjamBuku(R.drawable.lib_menu_pinjam_buku, "Pinjam\nBuku"),
-    DaftarPinjam(R.drawable.lib_menu_daftar_pinjam, "Daftar\nPinjam"),
-    DaftarPengguna(R.drawable.lib_menu_daftar_pengguna, "Daftar\nPengguna"),
-    DaftarKunjungan(R.drawable.lib_menu_daftar_kunjungan, "Daftar\nKunjungan")
+enum class LibraryMenu(val icon: Int, val title: String, val uri: String) {
+    PinjamBuku(R.drawable.lib_menu_pinjam_buku, "Pinjam\nBuku", Navigation.pinjamBuku),
+    DaftarPinjam(R.drawable.lib_menu_daftar_pinjam, "Daftar\nPinjam", Navigation.daftarPinjam),
+    DaftarPengguna(R.drawable.lib_menu_daftar_pengguna, "Daftar\nPengguna", Navigation.daftarPengguna),
+    DaftarKunjungan(R.drawable.lib_menu_daftar_kunjungan, "Daftar\nKunjungan", Navigation.daftarKunjungan)
 }

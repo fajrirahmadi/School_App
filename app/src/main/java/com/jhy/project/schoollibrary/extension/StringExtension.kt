@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.util.Patterns
 import android.widget.Toast
+import java.text.SimpleDateFormat
 import java.util.*
 
 fun String.capitalize(): String {
@@ -70,4 +71,16 @@ fun String.generateKeyword(): MutableList<String> {
     }
 
     return keyword
+}
+
+fun String.toMillis(format: String = "yyyy-MM-dd"): Long {
+    val sdf = SimpleDateFormat(format, Locale.getDefault())
+    val date = sdf.parse(this)
+    return date?.time ?: 0L
+}
+
+fun String.timeInMillis(): Long {
+    val hour = this.split(":")[0].toInt()
+    val minute = this.split(":")[1].toInt()
+    return (hour * 60 + minute) * 60000L
 }

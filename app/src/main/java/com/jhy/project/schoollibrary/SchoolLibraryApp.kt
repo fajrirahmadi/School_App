@@ -2,7 +2,6 @@ package com.jhy.project.schoollibrary
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.jhy.project.schoollibrary.constanta.RemoteConfigHelper
 import dagger.hilt.android.HiltAndroidApp
 

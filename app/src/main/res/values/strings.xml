@@ -50,4 +50,7 @@
     <string name="download_book">Download PDF</string>
     <string name="baca_buku">Baca Online</string>
     <string name="tanggal_pengembalian">Tanggal Pengembalian</string>
+    <string name="label_kegiatan">Kegiatan</string>
+    <string name="label_activity">Activity</string>
+    <string name="label_event">Event</string>
 </resources>

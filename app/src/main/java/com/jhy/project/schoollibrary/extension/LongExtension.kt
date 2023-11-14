@@ -1,7 +1,8 @@
 package com.jhy.project.schoollibrary.extension
 
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 fun Long.toIDRFormat(): String {
     return "IDR " + this.toDotsFormat()
@@ -35,4 +36,8 @@ fun Long.toMoment(): String {
         interval > 60 -> ((interval % 3600) / 60).toString() + "m ago"
         else -> "Just now"
     }
+}
+
+fun Long.isSameDate(other: Long, format: String = "ddMMyyyy"): Boolean {
+    return this.toDateFormat(format) == other.toDateFormat(format)
 }

@@ -2,11 +2,21 @@ package com.jhy.project.schoollibrary.feature.school.siswaalumni
 
 import android.os.Bundle
 import android.view.View
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -17,19 +27,29 @@ import androidx.fragment.app.viewModels
 import com.jhy.project.schoollibrary.R
 import com.jhy.project.schoollibrary.base.BaseComposeFragment
 import com.jhy.project.schoollibrary.component.ChooserBottomSheet
-import com.jhy.project.schoollibrary.component.compose.*
+import com.jhy.project.schoollibrary.component.compose.AppColor
+import com.jhy.project.schoollibrary.component.compose.FilterButton
+import com.jhy.project.schoollibrary.component.compose.HorizontalSpace
+import com.jhy.project.schoollibrary.component.compose.SearchTextField
+import com.jhy.project.schoollibrary.component.compose.UnSelectedButton
+import com.jhy.project.schoollibrary.component.compose.VerticalSpace
+import com.jhy.project.schoollibrary.component.compose.WorkSandTextMedium
+import com.jhy.project.schoollibrary.component.compose.WorkSandTextNormal
+import com.jhy.project.schoollibrary.component.compose.cariSiswaOrAlumni
 import com.jhy.project.schoollibrary.extension.capitalizeWord
 import com.jhy.project.schoollibrary.extension.showBottomSheet
+import com.jhy.project.schoollibrary.feature.library.book.BookCodeSheet
 import com.jhy.project.schoollibrary.model.alumni
+import com.jhy.project.schoollibrary.model.guru
 import com.jhy.project.schoollibrary.model.siswa
 import com.jhy.project.schoollibrary.model.wanita
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Calendar
 
 @AndroidEntryPoint
-class SAFragment : BaseComposeFragment() {
+class SDMFragment : BaseComposeFragment() {
 
-    private val viewModel by viewModels<SAViewModel>()
+    private val viewModel by viewModels<SDMViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,14 +77,13 @@ class SAFragment : BaseComposeFragment() {
                     })
                 VerticalSpace(height = 16.dp)
                 FilterUserSection(page = page)
-
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     item {
                         if (page == alumni) {
                             FilterItemSection("Pilih Tahun", tahun, generateYearList()) {
                                 viewModel.updateAlumniTahun(it)
                             }
-                        } else {
+                        } else if (page == siswa) {
                             FilterItemSection("Pilih Kelas", kelas, kelasList) {
                                 viewModel.updateKelas(it)
                             }
@@ -119,6 +138,16 @@ class SAFragment : BaseComposeFragment() {
                 .height(56.dp)
                 .padding(16.dp, 0.dp)
         ) {
+            FilterButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                text = "Guru",
+                selected = page == guru
+            ) {
+                viewModel.updatePage(guru)
+            }
+            HorizontalSpace(width = 16.dp)
             FilterButton(
                 modifier = Modifier
                     .fillMaxWidth()

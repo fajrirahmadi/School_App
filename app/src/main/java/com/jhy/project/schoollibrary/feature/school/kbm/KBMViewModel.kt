@@ -53,7 +53,6 @@ class KBMViewModel @Inject constructor(
             }
             if (!online) {
                 loadKelas(true)
-                return@addOnCompleteListener
             }
             postDelayed { showLoading(false) }
         }
@@ -79,7 +78,7 @@ class KBMViewModel @Inject constructor(
     }
 
     private fun loadMapelByKelas(kelas: String) {
-        val currentYear = config.currentSchoolYear()
+        val currentYear = config.currentSchoolYear().replace("/", "_")
         val filter = "${currentYear}_$kelas".lowercase()
         db.loadMapelByKelas(filter).addOnCompleteListener {
             if (it.isSuccessful) {

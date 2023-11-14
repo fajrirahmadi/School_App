@@ -1,5 +1,9 @@
 package com.jhy.project.schoollibrary.feature.library.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.model.Book
 import com.jhy.project.schoollibrary.model.BookCategory
@@ -8,6 +12,7 @@ import com.jhy.project.schoollibrary.model.adapter.BookAdapter
 import com.jhy.project.schoollibrary.model.adapter.FilterAdapter
 import com.jhy.project.schoollibrary.model.adapter.LibraryMenu
 import com.jhy.project.schoollibrary.model.adapter.LibraryMenuAdapter
+import com.jhy.project.schoollibrary.model.admin
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -19,57 +24,20 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(db) {
 
-    var selectedFilter = BookCategory.All
-    var keyword = ""
+    var isAdmin by mutableStateOf(false)
+        private set
 
-    private val _libraryMenuAdapter = ItemAdapter<LibraryMenuAdapter>()
-    val homeMenuAdapter by lazy {
-        FastAdapter.with(_libraryMenuAdapter)
-    }
+    var libMenuItems by mutableStateOf<List<LibraryMenu>>(emptyList())
+        private set
 
-    private val _filterAdapter = ItemAdapter<FilterAdapter>()
-    val filterAdapter by lazy {
-        FastAdapter.with(_filterAdapter)
-    }
+    var keyword by mutableStateOf("")
+        private set
 
-    private val bookList = mutableListOf<Book>()
-    private val _bookAdapter = ItemAdapter<BookAdapter>()
-    val bookAdapter by lazy {
-        FastAdapter.with(_bookAdapter)
-    }
+    var selectedFilter by mutableStateOf(BookCategory.All)
+        private set
 
-    private val _bookCount = MutableStateFlow(0)
-    val bookCountState = _bookCount.asStateFlow()
-
-    fun onCreate(online: Boolean = false) {
-        initFilterAdapter()
-        loadUserData()
-        loadCounter()
-        loadBookList(online)
-    }
-
-    private fun loadCounter(online: Boolean = false) {
-        db.loadBookCounter(online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result?.toObject(BookCounter::class.java)?.let { bookCount ->
-                    _bookCount.value = bookCount.count
-                }
-                if (!online) loadCounter(true)
-            }
-        }
-    }
-
-    fun initHomeMenuAdapter(admin: Boolean) {
-        if (_libraryMenuAdapter.adapterItemCount > 0) return
-        for (data in LibraryMenu.values().filter { admin || it != LibraryMenu.DaftarPengguna }) {
-            _libraryMenuAdapter.add(LibraryMenuAdapter(data))
-        }
-        homeMenuAdapter.notifyAdapterDataSetChanged()
-    }
-
-    private fun initFilterAdapter() {
-        _filterAdapter.clear()
-        val filters = listOf(
+    var filters by mutableStateOf(
+        listOf(
             BookCategory.All,
             BookCategory.Kelas7,
             BookCategory.Kelas8,
@@ -79,46 +47,51 @@ class HomeViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
             BookCategory.Agama,
             BookCategory.Novel
         )
-        for (filter in filters) {
-            _filterAdapter.add(FilterAdapter(filter, filter == selectedFilter))
-        }
-        filterAdapter.notifyAdapterDataSetChanged()
+    )
 
-        filterAdapter.onClickListener = { _, _, data, position ->
-            if (!data.choose) {
-                for ((index, item) in _filterAdapter.adapterItems.withIndex()) {
-                    if (item.choose) {
-                        _filterAdapter.getAdapterItem(index).choose = false
-                        break
-                    }
+    var bookCount by mutableIntStateOf(0)
+        private set
+
+    var bookList by mutableStateOf<List<Book>>(emptyList())
+        private set
+
+    fun onCreate(online: Boolean = false) {
+        loadUserData {
+            isAdmin = it.role == admin
+            libMenuItems = LibraryMenu.values()
+                .filter { menu ->
+                    isAdmin or (menu != LibraryMenu.DaftarPengguna)
                 }
-                selectedFilter = data.filter
-                _filterAdapter.getAdapterItem(position).choose = true
-                filterAdapter.notifyAdapterDataSetChanged()
-                resetPage()
+        }
+        loadCounter(online)
+        loadBookList(online)
+    }
+
+    private fun loadCounter(online: Boolean = false) {
+        db.loadBookCounter(online).addOnCompleteListener {
+            if (it.isSuccessful) {
+                it.result?.toObject(BookCounter::class.java)?.let { bookCount ->
+                    this.bookCount = bookCount.count
+                }
             }
-            true
+            if (!online) loadCounter(true)
         }
     }
 
     private fun resetPage() {
-        _bookAdapter.clear()
-        bookAdapter.notifyAdapterDataSetChanged()
         loadBookList(true)
     }
 
     private fun loadBookList(online: Boolean = false) {
-        showLoading(_bookAdapter.adapterItemCount == 0)
+        showLoading(bookList.isEmpty())
         db.loadBookList(getFilterBySelected(), keyword = keyword, online = online, limit = 50)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    bookList.clear()
-                    bookList.addAll(it.result.toObjects(Book::class.java))
+                    bookList = it.result.toObjects(Book::class.java)
                     if (bookList.isEmpty() && !online) {
                         loadBookList(true)
                         return@addOnCompleteListener
                     }
-                    showBookAdapter()
                 } else {
                     dismissLoading()
                 }
@@ -155,25 +128,14 @@ class HomeViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
         }
     }
 
-    fun showBookAdapter(firstPage: Boolean = true) {
-        if (firstPage) _bookAdapter.clear()
-        val startIndex = _bookAdapter.adapterItemCount
-        for ((index, data) in bookList.filterIndexed { index, _ -> index >= startIndex }
-            .withIndex()) {
-            _bookAdapter.add(BookAdapter(data))
-            if (index == 19) break
-        }
-        bookAdapter.notifyAdapterDataSetChanged()
-        postDelayed { dismissLoading() }
-    }
-
     fun doSearch(keyword: String = "") {
-        if (this.keyword == keyword) return
+        if (keyword.isNotEmpty() && keyword.length < 3) return
         this.keyword = keyword
         resetPage()
     }
 
-    fun filterIndex(): Int {
-        return selectedFilter.ordinal
+    fun updateSelectedFilter(item: BookCategory) {
+        selectedFilter = item
+        resetPage()
     }
 }

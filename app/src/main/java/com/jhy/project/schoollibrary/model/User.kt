@@ -24,6 +24,17 @@ data class User(
     var gender: String = pria,
     var pinjam: Boolean = false,
     var kelas: String? = null,
+    var alamat: String? = null,
+    var tanggalLahir: String? = null,
+    var tempatLahir: String? = null,
+    var agama: String? = null,
+    var wali: String? = null,
+    var ponsel: String? = null,
+    var job: String? = null,
+    var mapel: String? = null,
+    var golongan: String? = null,
+    var status: String? = null,
+    var kode: String? = null,
     var words: List<String> = emptyList()
 ) : Serializable
 

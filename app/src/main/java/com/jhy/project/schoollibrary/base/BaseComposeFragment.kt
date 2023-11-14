@@ -1,5 +1,6 @@
 package com.jhy.project.schoollibrary.base
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -12,8 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.jhy.project.schoollibrary.R
+import com.jhy.project.schoollibrary.auth.AuthActivity
 import com.jhy.project.schoollibrary.component.InfoDialog
 import com.jhy.project.schoollibrary.component.LoadingDialog
+import com.jhy.project.schoollibrary.component.WebViewActivity
+import com.jhy.project.schoollibrary.model.constant.Constant
 
 open class BaseComposeFragment : Fragment() {
 
@@ -74,5 +78,20 @@ open class BaseComposeFragment : Fragment() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun navigateToLoginPage() {
+        val intent = Intent(
+            requireActivity(),
+            AuthActivity::class.java
+        )
+        startActivity(intent)
+    }
+
+    fun showWeb(url: String) {
+        val intent = Intent(requireActivity(), WebViewActivity::class.java)
+        intent.putExtra(Constant.URL, url)
+        startActivity(intent)
+        requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
     }
 }

@@ -24,13 +24,11 @@ class FasilitasViewModel @Inject constructor(db: FirebaseRepository) : BaseViewM
         db.getFasilitas(online).addOnCompleteListener {
             if (it.isSuccessful) {
                 facilityState = it.result.toObject(SchoolFacilityModel::class.java)
-
-                if (!online) {
-                    loadFacility(true)
-                    return@addOnCompleteListener
-                }
             }
 
+            if (!online) {
+                loadFacility(true)
+            }
             postDelayed { showLoading(false) }
 
         }

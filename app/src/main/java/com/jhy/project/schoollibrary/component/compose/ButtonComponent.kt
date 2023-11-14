@@ -1,7 +1,6 @@
 package com.jhy.project.schoollibrary.component.compose
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -25,7 +24,7 @@ fun WorkSandButtonMedium(
     onClick: () -> Unit
 ) {
     OutlinedButton(modifier = modifier.alpha(alpha),
-        border = BorderStroke(1.dp, colorResource(id = R.color.textColor)),
+        border = BorderStroke(1.dp, AppColor.neutral40),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
         onClick = { onClick.invoke() }) {
         WorkSandTextMedium(text = text, size = textSize)
@@ -83,7 +82,7 @@ fun UnSelectedButton(
 }
 
 @Composable
-fun PrimaryButton(modifier: Modifier = Modifier.fillMaxWidth(), text: String, onClick: () -> Unit) {
+fun PrimaryButton(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
     Button(
         modifier = modifier,
         shape = RoundedCornerShape(50.dp),

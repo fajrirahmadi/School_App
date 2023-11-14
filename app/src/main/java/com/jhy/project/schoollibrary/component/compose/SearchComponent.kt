@@ -12,9 +12,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -22,15 +24,18 @@ import androidx.compose.ui.unit.dp
 import com.jhy.project.schoollibrary.R
 
 const val cariSiswaOrAlumni = "Cari siswa/alumni disini..."
+const val cariBukuDisini = "Cari buku disini..."
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchTextField(
     modifier: Modifier = Modifier,
     placeholder: String,
     text: String,
     onTextChange: (String) -> Unit,
-    onSearch: () -> Unit
+    onSearch: (String) -> Unit
 ) {
+    val controller = LocalSoftwareKeyboardController.current
     Box(
         modifier = modifier.border(BorderStroke(1.dp, AppColor.neutral40), RoundedCornerShape(50))
     ) {
@@ -63,7 +68,8 @@ fun SearchTextField(
                         imeAction = ImeAction.Search
                     ),
                     keyboardActions = KeyboardActions(onSearch = {
-                        onSearch()
+                        onSearch(text)
+                        controller?.hide()
                     }),
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = TextStyle(color = Color.Black)

@@ -59,6 +59,7 @@ class AuthViewModel @Inject constructor(
                     context,
                     "Link reset kata sandi telah dikirim ke email Anda, silakan gunakan link tersebut untuk mereset kata sandi Anda."
                 ) {
+                    dismissInfoDialog()
                     requestState.value = Pair(true, LiveDataTag.forgetPassword)
                 }
             } else {

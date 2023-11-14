@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.jhy.project.schoollibrary.R
@@ -13,6 +14,7 @@ import com.jhy.project.schoollibrary.base.BaseViewBindingFragment
 import com.jhy.project.schoollibrary.databinding.FragmentMenuBinding
 import com.jhy.project.schoollibrary.extension.*
 import com.jhy.project.schoollibrary.model.HomeMenu
+import com.jhy.project.schoollibrary.model.admin
 import com.jhy.project.schoollibrary.model.typeDeeplink
 import com.jhy.project.schoollibrary.model.typeWeb
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,8 +44,13 @@ class MainMenuFragment : BaseViewBindingFragment<FragmentMenuBinding>() {
         viewModel.userState.observe(viewLifecycleOwner) {
             binding.greetingTv.text = "Hi, ${it?.name?.firstWordCapitalize()}"
             binding.profileIv.setImage(it?.url, R.drawable.dummy_profile)
+            binding.addArticleBtn.isVisible = it?.role == admin
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.onCreate()
     }
 
@@ -68,12 +75,19 @@ class MainMenuFragment : BaseViewBindingFragment<FragmentMenuBinding>() {
             true
         }
         binding.newsRv.initVerticalAdapter(requireContext(), viewModel.articleAdapter)
+        viewModel.articleAdapter.onClickListener = { _, _, item, _ ->
+            findNavController().navigate(
+                MainMenuFragmentDirections.actionToArticleFragment(
+                    item.article
+                )
+            )
+            true
+        }
         binding.swipeRefresh.setOnRefreshListener {
             binding.swipeRefresh.isRefreshing = false
             viewModel.onCreate(true)
         }
         binding.addArticleBtn.setOnClickListener {
-            viewModel.importExtra()
         }
     }
 

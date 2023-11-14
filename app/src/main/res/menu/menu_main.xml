@@ -5,10 +5,16 @@
         android:icon="@drawable/menu_home_selector"
         android:title="@string/label_home"
         />
+
     <item
-        android:id="@+id/historyFragment"
+        android:id="@+id/eventFragment"
+        android:icon="@drawable/menu_calendar_selected"
+        android:title="@string/label_event" />
+
+    <item
+        android:id="@+id/activityFragment"
         android:icon="@drawable/menu_history_selector"
-        android:title="@string/label_history" />
+        android:title="@string/label_activity" />
 
     <item
         android:id="@+id/profileFragment"

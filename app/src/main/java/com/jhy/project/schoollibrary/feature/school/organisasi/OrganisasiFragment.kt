@@ -46,7 +46,7 @@ class OrganisasiFragment : BaseComposeFragment() {
                             ImageComponent(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp),
+                                    .aspectRatio(3f/2f),
                                 frame = it,
                                 scale = ContentScale.FillBounds
                             )

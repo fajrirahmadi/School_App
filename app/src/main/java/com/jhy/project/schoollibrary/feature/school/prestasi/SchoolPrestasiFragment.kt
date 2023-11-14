@@ -83,7 +83,7 @@ class SchoolPrestasiFragment : BaseComposeFragment() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp, 8.dp),
-                            backgroundColor = colorResource(id = R.color.neutral_40)
+                            backgroundColor = AppColor.pinkSoft
                         ) {
                             WorkSandTextMedium(
                                 modifier = Modifier.padding(8.dp),

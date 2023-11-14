@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,7 +39,7 @@ class ZoomImageBottomSheet(private val url: String) :
         }
         binding.composeView.setContent {
             var zoom by remember {
-                mutableStateOf(1f)
+                mutableFloatStateOf(1f)
             }
             var offset by remember {
                 mutableStateOf(Offset.Zero)

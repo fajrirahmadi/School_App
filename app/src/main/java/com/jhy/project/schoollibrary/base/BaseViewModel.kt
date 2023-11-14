@@ -7,7 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jhy.project.schoollibrary.component.InfoDialog
 import com.jhy.project.schoollibrary.model.User
+import com.jhy.project.schoollibrary.model.constant.Result
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 open class BaseViewModel(
     val db: FirebaseRepository,
@@ -15,7 +18,6 @@ open class BaseViewModel(
 
     val isLogin: Boolean
         get() = db.isLogin()
-    var isNavigate: Boolean = false
 
     private val baseHandler by lazy {
         Handler(Looper.getMainLooper())
@@ -29,16 +31,23 @@ open class BaseViewModel(
     val loadingState = MutableLiveData<Boolean>()
     val requestState = MutableLiveData<Pair<Boolean, String>>()
 
-    fun loadUserData() {
-        db.loadUser().addOnCompleteListener {
+    private val _resultState = MutableStateFlow<Result?>(null)
+    val resultState = _resultState.asStateFlow()
+
+    fun loadUserData(key: String? = null, online: Boolean = false, completion: ((User) -> Unit)? = null) {
+        db.loadUser(key, online = online).addOnCompleteListener {
             if (it.isSuccessful) {
-                userState.value = it.result?.toObject(User::class.java)
+                it.result?.toObject(User::class.java)?.let { user ->
+                    userState.value = user
+                    completion?.invoke(user)
+                }
             }
+            if (!online) loadUserData(key, true)
         }
     }
 
-    fun postDelayed(action: () -> Unit) {
-        baseHandler.postDelayed({ action.invoke() }, 4_00L)
+    fun postDelayed(delay: Long = 1000, action: () -> Unit) {
+        baseHandler.postDelayed({ action.invoke() }, delay)
     }
 
     fun showInfoDialog(context: Context, description: String, action: (() -> Unit)? = null) {
@@ -59,6 +68,10 @@ open class BaseViewModel(
 
     fun postRequest(success: Boolean, tag: String) {
         requestState.value = Pair(success, tag)
+    }
+
+    fun updateResult(result: Result) {
+        _resultState.value = result
     }
 
 }

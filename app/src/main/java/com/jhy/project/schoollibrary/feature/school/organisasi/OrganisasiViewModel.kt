@@ -24,11 +24,10 @@ class OrganisasiViewModel @Inject constructor(db: FirebaseRepository) : BaseView
         db.getOrganisasi(online).addOnCompleteListener {
             if (it.isSuccessful) {
                 organisasiState = it.result.toObject(SchoolOrganisasiModel::class.java)
+            }
 
-                if (!online) {
-                    loadOrganisasi(true)
-                    return@addOnCompleteListener
-                }
+            if (!online) {
+                loadOrganisasi(true)
             }
 
             postDelayed { showLoading(false) }
