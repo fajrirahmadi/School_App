@@ -3,10 +3,15 @@ package com.jhy.project.schoollibrary.feature.school.fasilitas
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.model.SchoolFacilityModel
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.utils.observeStatefulDoc
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,18 +24,19 @@ class FasilitasViewModel @Inject constructor(db: FirebaseRepository) : BaseViewM
         loadFacility()
     }
 
-    private fun loadFacility(online: Boolean = false) {
+    private var schoolJob: Job? = null
+    private fun loadFacility() {
         showLoading(facilityState == null)
-        db.getFasilitas(online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                facilityState = it.result.toObject(SchoolFacilityModel::class.java)
+        schoolJob?.cancel()
+        schoolJob = viewModelScope.launch {
+            observeStatefulDoc<SchoolFacilityModel>(
+                db.getFasilitas()
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    facilityState = it.data
+                }
+                postDelayed { showLoading(false) }
             }
-
-            if (!online) {
-                loadFacility(true)
-            }
-            postDelayed { showLoading(false) }
-
         }
     }
 }

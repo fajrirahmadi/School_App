@@ -3,10 +3,16 @@ package com.jhy.project.schoollibrary.extension
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.WriterException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 fun String.capitalize(): String {
     return this.replaceFirstChar {
@@ -83,4 +89,23 @@ fun String.timeInMillis(): Long {
     val hour = this.split(":")[0].toInt()
     val minute = this.split(":")[1].toInt()
     return (hour * 60 + minute) * 60000L
+}
+
+fun String.toBarCode(width: Int = 600, height: Int = 100): Bitmap {
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val codeWriter = MultiFormatWriter()
+    try {
+        val bitMatrix = codeWriter.encode(
+            this, BarcodeFormat.CODE_128, width, height
+        )
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val color = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
+                bitmap.setPixel(x, y, color)
+            }
+        }
+    } catch (e: WriterException) {
+        Log.d("TAG", "generateBarCode: ${e.message}")
+    }
+    return bitmap
 }

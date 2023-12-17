@@ -2,6 +2,7 @@ package com.jhy.project.schoollibrary.feature.event
 
 import android.os.Bundle
 import android.view.View
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,8 +43,6 @@ class EventFragment : BaseComposeFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel.onCreate()
 
         composeView.setContent {
             MaterialTheme {
@@ -105,7 +104,15 @@ class EventFragment : BaseComposeFragment() {
                                 items(events) { event ->
                                     Card(
                                         modifier = Modifier
-                                            .fillMaxWidth(),
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                if (viewModel.isAdmin) {
+                                                    findNavController().navigate(
+                                                        EventFragmentDirections.actionToAddEventFragment(event),
+                                                        getNavOptions()
+                                                    )
+                                                }
+                                            },
                                         backgroundColor = AppColor.greenSoft
                                     ) {
                                         Column(
@@ -134,6 +141,11 @@ class EventFragment : BaseComposeFragment() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onCreate()
     }
 
 }

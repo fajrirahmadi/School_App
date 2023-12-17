@@ -35,6 +35,8 @@ class BookPinjamFragment : BaseViewBindingFragment<FragmentBookPinjamBinding>() 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.setAsPaket(args.paket)
+
         bindView()
 
         viewModel.userState.observe(viewLifecycleOwner) {
@@ -78,7 +80,6 @@ class BookPinjamFragment : BaseViewBindingFragment<FragmentBookPinjamBinding>() 
         args.book?.let {
             viewModel.addBook(it)
         }
-
     }
 
     private fun bindView() {
@@ -110,7 +111,7 @@ class BookPinjamFragment : BaseViewBindingFragment<FragmentBookPinjamBinding>() 
 
     private fun showUserBottomSheet() {
         showBottomSheet(
-            UsersBottomSheet(object : UserListener {
+            UsersBottomSheet(null, object : UserListener {
                 @SuppressLint("SetTextI18n")
                 override fun pickUser(user: User) {
                     viewModel.userPinjam = user
@@ -122,17 +123,28 @@ class BookPinjamFragment : BaseViewBindingFragment<FragmentBookPinjamBinding>() 
     }
 
     private fun showBooksBottomSheet() {
+        if (viewModel.userPinjam == null) {
+            showInfoDialog(description = "Pilih data peminjam terlebih dahulu")
+            return
+        }
         showBottomSheet(
-            BookBottomSheet(object : BookListener {
-                override fun pickBook(book: Book) {
-                    showBottomSheet(
-                        BookCodeSheet {
+            BookBottomSheet(
+                if (viewModel.isPaket) viewModel.userPinjam?.kelas else null,
+                object : BookListener {
+                    override fun pickBook(book: Book, code: String?) {
+                        code?.let {
                             book.bookCode = it
                             viewModel.addBook(book)
-                        }, "book_code"
-                    )
-                }
-            }), booksBottomSheet
+                        } ?: run {
+                            showBottomSheet(
+                                BookCodeSheet {
+                                    book.bookCode = it
+                                    viewModel.addBook(book)
+                                }, "book_code"
+                            )
+                        }
+                    }
+                }), booksBottomSheet
         )
     }
 

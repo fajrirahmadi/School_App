@@ -145,7 +145,10 @@ fun MultipleLineEditText(
         maxLines = maxLines,
         decorationBox = { innerTextField ->
             Box(
-                modifier = modifier
+                modifier = modifier.border(
+                    BorderStroke(1.dp, AppColor.neutral40),
+                    RoundedCornerShape(10)
+                ).background(AppColor.white)
             ) {
                 if (value.isEmpty()) {
                     WorkSandTextNormal(

@@ -196,7 +196,7 @@ data class CalendarState(
     var selectedDate: Date? = null,
     var days: List<String> = getDays(),
     var dates: List<Date> = emptyList(),
-    var events: List<String> = emptyList(),
+    var events: String = "",
     var currentMonth: Int = 1,
     var currentYear: Int = 2023
 )

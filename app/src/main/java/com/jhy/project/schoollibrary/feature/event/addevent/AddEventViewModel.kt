@@ -128,4 +128,17 @@ class AddEventViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMo
             }
         }
     }
+
+    fun initialEvent(event: Event) {
+        updateEventNameState(event.name)
+        updateEventPlaceState(event.place)
+        updatePesertaState(event.user)
+        updateEventAgendaState(event.agenda)
+        updateStartDateState(event.startDate)
+        val startTime = event.startDate.toDateFormat("HH:mm").split(":")
+        updateStartTimeState(startTime[0], startTime[1])
+        updateEndDateState(event.endDate)
+        val endTime = event.endDate.toDateFormat("HH:mm").split(":")
+        updateEndTimeState(endTime[0], endTime[1])
+    }
 }

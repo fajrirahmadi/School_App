@@ -38,7 +38,12 @@ import com.jhy.project.schoollibrary.component.compose.VerticalSpace
 import com.jhy.project.schoollibrary.component.compose.WorkSandButtonMedium
 import com.jhy.project.schoollibrary.component.compose.WorkSandTextMedium
 import com.jhy.project.schoollibrary.component.compose.WorkSandTextNormal
+import com.jhy.project.schoollibrary.extension.showBottomSheet
+import com.jhy.project.schoollibrary.feature.library.user.UserListener
+import com.jhy.project.schoollibrary.feature.library.user.UsersBottomSheet
 import com.jhy.project.schoollibrary.model.Presence
+import com.jhy.project.schoollibrary.model.User
+import com.jhy.project.schoollibrary.model.guru
 import com.jhy.project.schoollibrary.model.toKelasText
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -53,63 +58,68 @@ class ActivityFragment : BaseComposeFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (viewModel.isLogin) {
-            setupPage()
-            initObservers()
-        } else {
-            composeView.setContent {
-                MaterialTheme {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        WorkSandTextMedium(
-                            text = "Untuk mengakses halaman ini, Anda harus terdaftar sebagai guru/pegawai SMPN 1 Painan"
-                        )
-                        VerticalSpace(height = 16.dp)
-                        WorkSandButtonMedium(text = "Masuk") {
-                            navigateToLoginPage()
-                        }
+        composeView.setContent {
+            MaterialTheme {
+                when {
+                    !viewModel.isLogin -> {
+                        NonLoginComponent()
+                    }
+
+                    else -> {
+                        ActivityPage()
                     }
                 }
             }
         }
     }
 
-    private fun setupPage() {
-        composeView.setContent {
-            MaterialTheme {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    item {
-                        ActivitySection()
+    override fun onResume() {
+        super.onResume()
+        initObservers()
+    }
+
+    @Composable
+    private fun ActivityPage() {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (viewModel.isAdmin) {
+                item {
+                    UnSelectedButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        text = viewModel.userName ?: "Pilih Guru"
+                    ) {
+                        showBottomSheet(UsersBottomSheet(guru, object : UserListener {
+                            override fun pickUser(user: User) {
+                                viewModel.updateUser(user.kode, user.name)
+                            }
+                        }))
                     }
-                    item {
-                        KelasSection()
-                    }
-                    item {
-                        PresenceSection()
-                    }
-                    item {
-                        AsesmenSection()
-                    }
+                }
+            }
+            if (!viewModel.selectedUser.isNullOrEmpty()) {
+                item {
+                    ActivitySection()
+                }
+                item {
+                    KelasSection()
+                }
+                item {
+                    PresenceSection()
                 }
             }
         }
     }
 
     private fun initObservers() {
+        if (!viewModel.isLogin) return
+
         viewModel.loadingState.observe(viewLifecycleOwner) {
             showLoading(it)
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
         viewModel.onCreate()
     }
 
@@ -181,8 +191,10 @@ class ActivityFragment : BaseComposeFragment() {
 
     @Composable
     fun KelasSection() {
-        val kelasList = viewModel.mapelState?.kelas?.map { it.split("_").lastOrNull()?.toKelasText() ?: "" } ?: emptyList()
-        val selectedKelas = viewModel.selectedFilter[SectionType.Kurikulum] ?: ""
+        val kelasList =
+            viewModel.mapelState?.kelas?.map { it.split("_").lastOrNull()?.toKelasText() ?: "" }
+                ?: emptyList()
+        val selectedKelas = viewModel.selectedFilter[SectionType.Kurikulum]
         SectionComponent(
             backgroundColor = AppColor.greenSoft
         ) {
@@ -193,47 +205,49 @@ class ActivityFragment : BaseComposeFragment() {
             FilterComponent(
                 sectionType = SectionType.Kurikulum,
                 items = kelasList,
-                selectedItem = selectedKelas,
+                selectedItem = selectedKelas ?: "",
                 onChange = viewModel::updateSelectedFilter
             )
             VerticalSpace(height = 16.dp)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WorkSandTextMedium(
-                    modifier = Modifier.weight(1f),
-                    text = "Capaian Pembelajaran (CP)",
-                    align = TextAlign.Left
-                )
-                WorkSandButtonMedium(text = "Lihat") {
+            selectedKelas?.let {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    WorkSandTextMedium(
+                        modifier = Modifier.weight(1f),
+                        text = "Capaian Pembelajaran (CP)",
+                        align = TextAlign.Left
+                    )
+                    WorkSandButtonMedium(text = "Lihat") {
 
+                    }
                 }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WorkSandTextMedium(
-                    modifier = Modifier.weight(1f),
-                    text = "Alur Tujuan Pembelajaran (ATP)",
-                    align = TextAlign.Left
-                )
-                WorkSandButtonMedium(text = "Lihat") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    WorkSandTextMedium(
+                        modifier = Modifier.weight(1f),
+                        text = "Alur Tujuan Pembelajaran (ATP)",
+                        align = TextAlign.Left
+                    )
+                    WorkSandButtonMedium(text = "Lihat") {
 
+                    }
                 }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WorkSandTextMedium(
-                    modifier = Modifier.weight(1f),
-                    text = "Perangkat Ajar",
-                    align = TextAlign.Left
-                )
-                WorkSandButtonMedium(text = "Lihat") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    WorkSandTextMedium(
+                        modifier = Modifier.weight(1f),
+                        text = "Perangkat Ajar",
+                        align = TextAlign.Left
+                    )
+                    WorkSandButtonMedium(text = "Lihat") {
 
+                    }
                 }
             }
         }
@@ -266,6 +280,7 @@ class ActivityFragment : BaseComposeFragment() {
                         modifier = Modifier
                             .width(300.dp)
                             .clickable {
+                                if (viewModel.isAdmin) return@clickable
                                 viewModel.mapelState?.let {
                                     findNavController().navigate(
                                         ActivityFragmentDirections.actionToPresenceFragment(
@@ -303,16 +318,18 @@ class ActivityFragment : BaseComposeFragment() {
                     }
                 }
             }
-            VerticalSpace(height = 16.dp)
-            PrimaryButton(
-                modifier = Modifier.fillMaxWidth(), text = "Tambah Pertemuan"
-            ) {
-                viewModel.mapelState?.let {
-                    findNavController().navigate(
-                        ActivityFragmentDirections.actionToPresenceFragment(
-                            selectedKelas, it
+            if (!viewModel.isAdmin) {
+                VerticalSpace(height = 16.dp)
+                PrimaryButton(
+                    modifier = Modifier.fillMaxWidth(), text = "Tambah Pertemuan"
+                ) {
+                    viewModel.mapelState?.let {
+                        findNavController().navigate(
+                            ActivityFragmentDirections.actionToPresenceFragment(
+                                selectedKelas, it
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

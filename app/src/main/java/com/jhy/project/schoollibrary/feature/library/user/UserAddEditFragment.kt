@@ -39,7 +39,6 @@ class UserAddEditFragment : BaseViewBindingFragment<FragmentUserAddEditBinding>(
     private fun bindView() {
         binding.apply {
             args.user?.let { user ->
-                viewModel.checkPinjaman(user.key ?: "")
                 idEt.apply {
                     isEnabled = false
                     setText(user.no_id)
@@ -57,7 +56,7 @@ class UserAddEditFragment : BaseViewBindingFragment<FragmentUserAddEditBinding>(
                     }
                 }
                 cetakBtn.setOnClickListener {
-                    if (viewModel.adaPinjaman) {
+                    if (user.pinjaman > 0) {
                         showInfoDialog(
                             requireContext(),
                             "${user.name} masih ada pinjaman buku, silakan kembalikan terlebih dahulu"
@@ -78,11 +77,11 @@ class UserAddEditFragment : BaseViewBindingFragment<FragmentUserAddEditBinding>(
 
                 kelasEt.apply {
                     isVisible = args.type == siswa
-                    setText(user.kelas)
+                    setText(user.kelas?.toKelasText())
                     setOnClickListener {
                         showBottomSheet(
                             ClassListBottomSheet {
-                                setText(it.value)
+                                setText(it.value.toKelasText())
                             }, classListBottomSheet
                         )
                     }
@@ -92,13 +91,13 @@ class UserAddEditFragment : BaseViewBindingFragment<FragmentUserAddEditBinding>(
             kelasLabel.isVisible = args.type == siswa
 
             btnSubmit.setOnClickListener {
-                val user = args.user ?: User()
+                val user = args.user?.copy() ?: User()
                 user.apply {
                     name = nameEt.trim
                     gender = this@UserAddEditFragment.gender
                     no_id = idEt.trim
                     email = "${idEt.trim}@mailinator.com"
-                    kelas = kelasEt.trim
+                    kelas = kelasEt.trim.toKelasRequest()
                 }
                 viewModel.submitUser(user)
             }

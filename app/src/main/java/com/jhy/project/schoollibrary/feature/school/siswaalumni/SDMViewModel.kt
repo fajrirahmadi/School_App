@@ -1,16 +1,28 @@
 package com.jhy.project.schoollibrary.feature.school.siswaalumni
 
-import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
+import com.jhy.project.schoollibrary.extension.asList
 import com.jhy.project.schoollibrary.model.Kelas
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.alumni
 import com.jhy.project.schoollibrary.model.guru
 import com.jhy.project.schoollibrary.model.siswa
+import com.jhy.project.schoollibrary.model.state.ErrorType
+import com.jhy.project.schoollibrary.model.state.FirestoreState
+import com.jhy.project.schoollibrary.model.state.SDMListState
+import com.jhy.project.schoollibrary.model.state.UIState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.loadUserListByRoleAndClass
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -33,10 +45,11 @@ class SDMViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(d
     private val _kelasState = MutableStateFlow(defaultKelas)
     val kelasState = _kelasState.asStateFlow()
 
-    private val _userListState = MutableStateFlow(emptyList<User>())
-    val userListState = _userListState.asStateFlow()
+    var sdmState by mutableStateOf(SDMListState())
+        private set
 
     fun onCreate() {
+        if (sdmState.scrollState != 0) return
         loadKelasFilter()
         updatePage(guru)
     }
@@ -61,23 +74,42 @@ class SDMViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(d
         loadUser(kelas)
     }
 
+    var kelasJob: Job? = null
     private fun loadKelasFilter() {
-        db.getKelas().addOnCompleteListener {
-            if (it.isSuccessful) {
-                _kelasListState.value = it.result.toObjects(Kelas::class.java).map {
-                    it.name.uppercase()
+        kelasJob?.cancel()
+        kelasJob = viewModelScope.launch {
+            observeStatefulCollection<Kelas>(
+                db.getKelas()
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    _kelasListState.value = it.data.asList<Kelas>().map { it.name.uppercase() }
                 }
             }
         }
     }
 
+    var guruJob: Job? = null
     private fun loadUser(kelas: String) {
-        showLoading()
-        db.loadUserListByRoleAndClass(_pageState.value, kelas, keyword, 50).addOnCompleteListener {
-            if (it.isSuccessful) {
-                _userListState.value = it.result.toObjects(User::class.java)
+        guruJob?.cancel()
+        guruJob = viewModelScope.launch {
+            observeStatefulCollection<User>(
+                db.loadUserListByRoleAndClass(_pageState.value, kelas, keyword, 100)
+            ).collect {
+                sdmState = when (it) {
+                    is FirestoreState.Failed -> sdmState.copy(
+                        userListState = UIState.Error(ErrorType.NetworkError)
+                    )
+
+                    is FirestoreState.Loading -> sdmState.copy(
+                        userListState = UIState.Loading
+                    )
+
+                    is FirestoreState.Success -> sdmState.copy(
+                        userListState = UIState.Success(it.data),
+                        scrollState = 0
+                    )
+                }
             }
-            postDelayed { showLoading(false) }
         }
     }
 
@@ -87,13 +119,9 @@ class SDMViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(d
         updatePage(_pageState.value)
     }
 
-    fun updateTeacherCode(context: Context, key: String?, kode: String) {
-        key?.let {
-            showLoading()
-            db.updateUserByNis(key, mapOf("kode" to kode)).addOnCompleteListener {
-                dismissLoading()
-                showInfoDialog(context, "Berhasil")
-            }
-        }
+    fun updateScrollState(index: Int) {
+        sdmState = sdmState.copy(
+            scrollState = index
+        )
     }
 }

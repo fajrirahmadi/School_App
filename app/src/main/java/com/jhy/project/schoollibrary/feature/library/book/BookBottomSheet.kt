@@ -1,8 +1,6 @@
 package com.jhy.project.schoollibrary.feature.library.book
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,14 +20,17 @@ import dagger.hilt.android.AndroidEntryPoint
 const val booksBottomSheet = "books_bottom_sheet"
 
 @AndroidEntryPoint
-class BookBottomSheet(private val listener: BookListener) :
+class BookBottomSheet(
+    private val filter: String? = null,
+    private val listener: BookListener
+) :
     BaseViewBindingBottomSheet<BottomsheetListBinding>() {
 
     private val viewModel by viewModels<BookSheetViewModel>()
 
     private val barLauncher = registerForActivityResult(ScanContract()) { result ->
         result.contents?.let {
-            binding.searchBox.setText(it.replace("-", ""))
+            binding.searchBox.setText(it)
         }
     }
 
@@ -43,11 +44,12 @@ class BookBottomSheet(private val listener: BookListener) :
         }
 
         viewModel.bookAdapter.onClickListener = { _, _, data, _ ->
-            listener.pickBook(data.book)
+            listener.pickBook(data.book, viewModel.code)
             dismiss()
             true
         }
 
+        viewModel.filter = filter
         viewModel.loadBookList()
     }
 
@@ -98,5 +100,5 @@ class BookBottomSheet(private val listener: BookListener) :
 }
 
 interface BookListener {
-    fun pickBook(book: Book)
+    fun pickBook(book: Book, code: String?)
 }

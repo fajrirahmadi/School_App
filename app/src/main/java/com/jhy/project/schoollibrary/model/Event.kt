@@ -1,5 +1,7 @@
 package com.jhy.project.schoollibrary.model
 
+import java.io.Serializable
+
 data class Event(
     var key: String = "",
     var name: String = "",
@@ -11,4 +13,4 @@ data class Event(
     var noId: String = "",
     var attachments: List<String> = emptyList(),
     var filters: List<String> = emptyList()
-)
+) : Serializable

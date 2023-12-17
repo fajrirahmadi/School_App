@@ -1,5 +1,6 @@
 package com.jhy.project.schoollibrary.model
 
+import androidx.core.text.isDigitsOnly
 import java.io.Serializable
 
 data class Book(
@@ -23,6 +24,17 @@ data class Book(
 fun String.toBookCategory(): BookCategory {
     return if (enumContains<BookCategory>(this)) enumValueOf(this)
     else BookCategory.Umum
+}
+
+fun String.toAvailableISBN(): Array<String> {
+    val isISBN = this.replace("-", "").isDigitsOnly()
+    return when {
+        isISBN -> arrayOf(this.replace("-", ""))
+        else -> {
+            val words = this.split("-")
+            arrayOf(words[1], words[2])
+        }
+    }
 }
 
 inline fun <reified T : Enum<T>> enumContains(name: String): Boolean {

@@ -5,12 +5,18 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.component.InfoDialog
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.constant.Result
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.loadUser
+import com.jhy.project.schoollibrary.utils.observeStatefulDoc
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 open class BaseViewModel(
     val db: FirebaseRepository,
@@ -34,15 +40,24 @@ open class BaseViewModel(
     private val _resultState = MutableStateFlow<Result?>(null)
     val resultState = _resultState.asStateFlow()
 
-    fun loadUserData(key: String? = null, online: Boolean = false, completion: ((User) -> Unit)? = null) {
-        db.loadUser(key, online = online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result?.toObject(User::class.java)?.let { user ->
-                    userState.value = user
-                    completion?.invoke(user)
+    private val _errorState = MutableStateFlow<Result?>(null)
+    val errorState = _errorState.asStateFlow()
+
+    var userJob: Job? = null
+    fun loadUserData(
+        key: String? = null,
+        completion: ((User) -> Unit)? = null
+    ) {
+        userJob?.cancel()
+        userJob = viewModelScope.launch {
+            observeStatefulDoc<User>(db.loadUser(key)).collect {
+                if (it is FirestoreState.Success) {
+                    it.data?.let { user ->
+                        userState.value = user
+                        completion?.invoke(user)
+                    }
                 }
             }
-            if (!online) loadUserData(key, true)
         }
     }
 

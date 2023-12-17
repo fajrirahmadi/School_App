@@ -1,6 +1,8 @@
 package com.jhy.project.schoollibrary.feature.main
 
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
+import com.jhy.project.schoollibrary.extension.asList
 import com.jhy.project.schoollibrary.extension.capitalizeWord
 import com.jhy.project.schoollibrary.model.Article
 import com.jhy.project.schoollibrary.model.HomeMenu
@@ -11,9 +13,13 @@ import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.adapter.ArticleAdapter
 import com.jhy.project.schoollibrary.model.adapter.BannerAdapter
 import com.jhy.project.schoollibrary.model.adapter.HomeMenuAdapter
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,36 +29,36 @@ class MainMenuViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMo
     val homeMenuAdapter = FastItemAdapter<HomeMenuAdapter>()
     val articleAdapter = FastItemAdapter<ArticleAdapter>()
 
-    fun onCreate(online: Boolean = false) {
-        loadHomeMenu(online)
-        loadArticle(online)
+    fun onCreate() {
+        loadHomeMenu()
+        loadArticle()
         loadUserData()
     }
 
-    private fun loadHomeMenu(online: Boolean = false) {
+    private var homeJob: Job? = null
+    private fun loadHomeMenu() {
         showLoading(bannerAdapter.adapterItemCount == 0)
-        db.loadHomeMenu(online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val responses = it.result.toObjects(HomeModel::class.java)
-                if (responses.isEmpty() && !online) {
-                    loadHomeMenu(true)
-                    return@addOnCompleteListener
+        homeJob?.cancel()
+        homeJob = viewModelScope.launch {
+            observeStatefulCollection<HomeModel>(
+                db.loadHomeMenu()
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    showHomeMenu(it.data.asList())
                 }
-                showHomeMenu(responses)
+                postDelayed { showLoading(false) }
             }
-            postDelayed { showLoading(false) }
         }
     }
 
-    private fun loadArticle(online: Boolean = false) {
-        db.loadArticle(online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val responses = it.result.toObjects(Article::class.java)
-                if (responses.isEmpty() && !online) {
-                    loadArticle(true)
-                    return@addOnCompleteListener
+    private var articleJob: Job? = null
+    private fun loadArticle() {
+        articleJob?.cancel()
+        articleJob = viewModelScope.launch {
+            observeStatefulCollection<Article>(db.loadArticle()).collect {
+                if (it is FirestoreState.Success) {
+                    showArticle(it.data.asList())
                 }
-                showArticle(responses)
             }
         }
     }
@@ -184,21 +190,6 @@ class MainMenuViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMo
         }
     }
 
-    fun updateKelas() {
-        db.loadUserByClass(listOf("VIII.1", "VIII.2")).addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result.toObjects(User::class.java).forEach {
-                    db.updateUserByNis(
-                        it.key ?: "", mapOf(
-                            "kelas" to (it.kelas?.replace(".", "_") ?: "")
-                        )
-                    )
-                }
-            }
-        }
-        val key = "2023-2024_1_vii.1_41"
-    }
-
     fun createJadwal() {
         val dataset =
             "vii.1,20,20,20,,45,45,,,,,39,39,42,42,,40,40,,,,,8,8,8,23,,23,23,2,,2,,45,45,28,28,,,,15,,15,,8,8,,,,,,15,15,,,,\n" +
@@ -230,74 +221,50 @@ class MainMenuViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMo
         updateDataMapel(1, roster)
     }
 
-    fun updateDataMapel(counter: Int = 1, rosters: List<String>) {
+    var userByCodeJob: Job? = null
+    private fun updateDataMapel(counter: Int = 1, rosters: List<String>) {
         if (counter == 48) {
             showLoading(false)
             return
         }
         showLoading()
-        db.loadUserByKode(counter.toString()).addOnCompleteListener {
-            if (it.isSuccessful && !it.result.isEmpty) {
-                val user = it.result.toObjects(User::class.java).first()
-                val kelas = mutableMapOf<String, Boolean>()
-                rosters.forEach {
-                    val codes = it.split(",")
-                    val parent = codes.first()
-                    val found = codes.contains(counter.toString())
-                    kelas["2023_2024_${parent.lowercase()}"] = found
-                }
-
-                val nama =
-                    user.mapel?.lowercase()?.replace("guru mapel", "")?.capitalizeWord()
-                        ?: ""
-
-                val mapel = Mapel(
-                    "2023_2024_1_$counter",
-                    nama,
-                    user.name ?: "",
-                    counter.toString(),
-                    user.no_id ?: "",
-                    kelas.filter { it.value }.keys.toList(),
-                    "2023/2024",
-                    "1"
-                )
-
-                db.submitMapel(mapel).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        updateDataMapel(counter + 1, rosters)
+        userByCodeJob?.cancel()
+        userByCodeJob = viewModelScope.launch {
+            observeStatefulCollection<User>(
+                db.loadUserByKode(counter.toString())
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    val user = it.data.asList<User>().firstOrNull()
+                    val kelas = mutableMapOf<String, Boolean>()
+                    rosters.forEach {
+                        val codes = it.split(",")
+                        val parent = codes.first()
+                        val found = codes.contains(counter.toString())
+                        kelas["2023_2024_${parent.lowercase()}"] = found
                     }
-                }
-            } else {
-                updateDataMapel(counter + 1, rosters)
-            }
-        }
-    }
 
-    fun migrateUser() {
-        val currentKey = "xPjJWp6XXpgyPdTJfyIEt4NWXVC2"
-        val newKey = "0jUuhSkSMQg6gKiFxAvn50S4dEh2"
+                    val nama =
+                        user?.mapel?.lowercase()?.replace("guru mapel", "")?.capitalizeWord()
+                            ?: ""
 
-        showLoading()
-        db.loadUser(currentKey, true).continueWith {
-            it.result.toObject(User::class.java)?.let {
-                it.key = newKey
-                return@continueWith db.updateUser(it, currentKey = currentKey)
-            }
-        }.addOnCompleteListener {
-            postDelayed { dismissLoading() }
-        }
-    }
-
-    fun migrateAlumni() {
-        db.loadUserList().addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result.toObjects(User::class.java).forEach {
-                    db.updateUserByNis(
-                        it.key ?: "",
-                        mapOf(
-                            "kelas" to (it.kelas?.replace("alumni", "ALUMNI") ?: "")
-                        )
+                    val mapel = Mapel(
+                        "2023_2024_1_$counter",
+                        nama,
+                        user?.name ?: "",
+                        counter.toString(),
+                        user?.no_id ?: "",
+                        kelas.filter { it.value }.keys.toList(),
+                        "2023/2024",
+                        "1"
                     )
+
+                    db.submitMapel(mapel).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            updateDataMapel(counter + 1, rosters)
+                        }
+                    }
+                } else {
+                    updateDataMapel(counter + 1, rosters)
                 }
             }
         }

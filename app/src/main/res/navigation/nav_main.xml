@@ -16,6 +16,10 @@
         <action
             android:id="@+id/action_to_articleFragment"
             app:destination="@+id/articleFragment" />
+
+        <action
+            android:id="@+id/action_to_addArticleFragment"
+            app:destination="@+id/addArticleFragment" />
     </fragment>
 
     <fragment
@@ -35,6 +39,11 @@
             app:argType="com.jhy.project.schoollibrary.model.Article"
             app:nullable="false" />
     </fragment>
+
+    <fragment
+        android:id="@+id/addArticleFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.article.add.AddArticleFragment"
+        android:label="Tambah Artikel/Berita"/>
 
     <fragment
         android:id="@+id/presenceFragment"
@@ -69,7 +78,13 @@
     <fragment
         android:id="@+id/addEventFragment"
         android:name="com.jhy.project.schoollibrary.feature.event.addevent.AddEventFragment"
-        android:label="Tambah Acara" />
+        android:label="Tambah Acara">
+        <argument
+            android:name="event"
+            android:defaultValue="@null"
+            app:argType="com.jhy.project.schoollibrary.model.Event"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/schoolProfileFragment"
@@ -77,6 +92,13 @@
         android:label=" "
         tools:layout="@layout/fragment_school_profile">
         <deepLink app:uri="sekolahdigital://home/school-profile" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookPackageFragment"
+        android:name="com.jhy.project.schoollibrary.feature.library.home.BookPackageFragment"
+        android:label="Buku Paket">
+        <deepLink app:uri="sekolahdigital://home/library/book-package" />
     </fragment>
 
     <fragment
@@ -98,6 +120,16 @@
         android:name="com.jhy.project.schoollibrary.feature.school.siswaalumni.SDMFragment"
         android:label=" ">
         <deepLink app:uri="sekolahdigital://home/siswa-alumni" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/sdmDetailFragment"
+        android:name="com.jhy.project.schoollibrary.feature.school.siswaalumni.SDMDetailFragment"
+        android:label=" ">
+        <argument
+            android:name="key"
+            app:argType="string" />
+        <deepLink app:uri="sekolahdigital://home/sdm/detail?key={key}" />
     </fragment>
 
     <fragment
@@ -171,7 +203,7 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.jhy.project.schoollibrary.feature.profile.ProfileV2Fragment"
+        android:name="com.jhy.project.schoollibrary.feature.profile.ProfileFragment"
         android:label="Profil" />
 
     <fragment
@@ -182,6 +214,15 @@
         <argument
             android:name="key"
             app:argType="string" />
+        <argument
+            android:name="paket"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="code"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_to_addEditBookFragment"
             app:destination="@+id/addEditBookFragment" />
@@ -195,7 +236,7 @@
             android:id="@+id/action_to_bookReadPdfFragment"
             app:destination="@+id/bookReadPdfFragment" />
 
-        <deepLink app:uri="sekolahdigital://home/library/book/detail?key={key}" />
+        <deepLink app:uri="sekolahdigital://home/library/book/detail?key={key}&amp;paket={paket}&amp;code={code}" />
 
     </fragment>
 
@@ -235,7 +276,11 @@
             android:defaultValue="@null"
             app:argType="com.jhy.project.schoollibrary.model.Book"
             app:nullable="true" />
-        <deepLink app:uri="sekolahdigital://home/library/pinjam-buku" />
+        <argument
+            android:name="paket"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <deepLink app:uri="sekolahdigital://home/library/pinjam-buku?paket={paket}" />
 
     </fragment>
 

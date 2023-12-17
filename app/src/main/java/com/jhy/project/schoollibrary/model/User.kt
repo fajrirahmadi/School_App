@@ -19,6 +19,7 @@ data class User(
     var role: String = user,
     var createdDate: Long = System.currentTimeMillis(),
     var no_id: String? = null,
+    var nik: String? = null,
     var url: String? = null,
     var active: Boolean = true,
     var gender: String = pria,
@@ -35,6 +36,7 @@ data class User(
     var golongan: String? = null,
     var status: String? = null,
     var kode: String? = null,
+    var pinjaman: Int = 0,
     var words: List<String> = emptyList()
 ) : Serializable
 

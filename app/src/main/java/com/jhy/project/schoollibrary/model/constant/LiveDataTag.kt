@@ -14,5 +14,8 @@ class LiveDataTag {
 
         //User
         const val addEditUser = "addEditUser"
+
+        //Article
+        const val addArticle = "addArticle"
     }
 }

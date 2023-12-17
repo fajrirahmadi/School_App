@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
@@ -14,11 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.jhy.project.schoollibrary.base.BaseComposeFragment
 import com.jhy.project.schoollibrary.component.DatePickerBottomSheet
 import com.jhy.project.schoollibrary.component.compose.DatePicker
 import com.jhy.project.schoollibrary.component.compose.EditTextWithTitle
+import com.jhy.project.schoollibrary.component.compose.MultipleLineEditText
 import com.jhy.project.schoollibrary.component.compose.PrimaryButton
+import com.jhy.project.schoollibrary.component.compose.WorkSandTextMedium
 import com.jhy.project.schoollibrary.component.picker.TimePickerBottomSheet
 import com.jhy.project.schoollibrary.extension.showBottomSheet
 import com.jhy.project.schoollibrary.extension.toMillis
@@ -31,11 +35,10 @@ import kotlinx.coroutines.launch
 class AddEventFragment : BaseComposeFragment() {
 
     private val viewModel by viewModels<AddEventViewModel>()
+    private val args by navArgs<AddEventFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initObservers()
 
         composeView.setContent {
             MaterialTheme {
@@ -68,11 +71,12 @@ class AddEventFragment : BaseComposeFragment() {
                                 text = viewModel.eventAgendaState,
                                 onTextChange = viewModel::updateEventAgendaState
                             )
-                            EditTextWithTitle(
-                                title = "Peserta Acara",
-                                placeholder = "Masukkan peserta acara",
-                                text = viewModel.pesertaState,
-                                onTextChange = viewModel::updatePesertaState
+                            WorkSandTextMedium(text = "Peserta acara")
+                            MultipleLineEditText(
+                                modifier = Modifier.fillMaxWidth().height(48.dp),
+                                value = viewModel.pesertaState,
+                                onValueChange = viewModel::updatePesertaState,
+                                hintText = "Masukkan peserta acara"
                             )
                             DatePicker(
                                 title = "Tanggal Mulai",
@@ -126,6 +130,9 @@ class AddEventFragment : BaseComposeFragment() {
                 }
             }
         }
+
+        initObservers()
+
     }
 
     private fun initObservers() {
@@ -145,6 +152,10 @@ class AddEventFragment : BaseComposeFragment() {
                     else -> {}
                 }
             }
+        }
+
+        args.event?.let {
+            viewModel.initialEvent(it)
         }
     }
 }

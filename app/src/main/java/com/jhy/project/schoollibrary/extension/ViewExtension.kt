@@ -27,6 +27,18 @@ fun View.slideToBottom() {
     }
 }
 
+fun View.slideFromTop() {
+    if (translationY < 0f) {
+        animate().translationY(0f)
+    }
+}
+
+fun View.slideToTop() {
+    if (translationY == 0f) {
+        animate().translationY(-height.toFloat())
+    }
+}
+
 fun View.slideFromBottom() {
     if (translationY > 0f) animate().translationY(0f)
 }

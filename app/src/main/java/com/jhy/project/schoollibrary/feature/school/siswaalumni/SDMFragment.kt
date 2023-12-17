@@ -2,7 +2,6 @@ package com.jhy.project.schoollibrary.feature.school.siswaalumni
 
 import android.os.Bundle
 import android.view.View
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,13 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Card
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -27,23 +28,27 @@ import androidx.fragment.app.viewModels
 import com.jhy.project.schoollibrary.R
 import com.jhy.project.schoollibrary.base.BaseComposeFragment
 import com.jhy.project.schoollibrary.component.ChooserBottomSheet
-import com.jhy.project.schoollibrary.component.compose.AppColor
+import com.jhy.project.schoollibrary.component.compose.ErrorComponent
 import com.jhy.project.schoollibrary.component.compose.FilterButton
 import com.jhy.project.schoollibrary.component.compose.HorizontalSpace
 import com.jhy.project.schoollibrary.component.compose.SearchTextField
 import com.jhy.project.schoollibrary.component.compose.UnSelectedButton
 import com.jhy.project.schoollibrary.component.compose.VerticalSpace
 import com.jhy.project.schoollibrary.component.compose.WorkSandTextMedium
-import com.jhy.project.schoollibrary.component.compose.WorkSandTextNormal
 import com.jhy.project.schoollibrary.component.compose.cariSiswaOrAlumni
-import com.jhy.project.schoollibrary.extension.capitalizeWord
+import com.jhy.project.schoollibrary.component.compose.features.UserComponent
+import com.jhy.project.schoollibrary.component.compose.features.UserShimmer
+import com.jhy.project.schoollibrary.constanta.Navigation
+import com.jhy.project.schoollibrary.extension.asList
 import com.jhy.project.schoollibrary.extension.showBottomSheet
-import com.jhy.project.schoollibrary.feature.library.book.BookCodeSheet
+import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.alumni
 import com.jhy.project.schoollibrary.model.guru
 import com.jhy.project.schoollibrary.model.siswa
-import com.jhy.project.schoollibrary.model.wanita
+import com.jhy.project.schoollibrary.model.state.UIState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import java.util.Calendar
 
 @AndroidEntryPoint
@@ -58,7 +63,7 @@ class SDMFragment : BaseComposeFragment() {
             val tahun = viewModel.alumniTahunState.collectAsState().value
             val kelasList = viewModel.kelasListState.collectAsState().value
             val kelas = viewModel.kelasState.collectAsState().value
-            val users = viewModel.userListState.collectAsState().value
+            val userState = viewModel.sdmState.userListState
             var searchText by remember { mutableStateOf("") }
 
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -77,7 +82,20 @@ class SDMFragment : BaseComposeFragment() {
                     })
                 VerticalSpace(height = 16.dp)
                 FilterUserSection(page = page)
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                val listState =
+                    rememberLazyListState(initialFirstVisibleItemIndex = viewModel.sdmState.scrollState)
+                LaunchedEffect(listState) {
+                    snapshotFlow {
+                        listState.firstVisibleItemIndex
+                    }.debounce(500L)
+                        .collectLatest { index ->
+                            viewModel.updateScrollState(index)
+                        }
+                }
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = listState
+                ) {
                     item {
                         if (page == alumni) {
                             FilterItemSection("Pilih Tahun", tahun, generateYearList()) {
@@ -89,42 +107,29 @@ class SDMFragment : BaseComposeFragment() {
                             }
                         }
                     }
-                    itemsIndexed(users) { _, item ->
-                        val background = if (wanita.equals(
-                                item.gender,
-                                true
-                            )
-                        ) AppColor.pinkSoft else AppColor.blueSoft
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp, 8.dp),
-                            backgroundColor = background
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                WorkSandTextMedium(
-                                    text = "Nama: ${item.name ?: ""}", color = AppColor.neutral40
-                                )
-                                VerticalSpace(height = 8.dp)
-                                WorkSandTextNormal(
-                                    text = item.kelas?.replace(".", " ")?.replace("_", " ")
-                                        ?.capitalizeWord() ?: "",
-                                    color = AppColor.neutral40,
-                                    textAlign = TextAlign.Start
-                                )
+                    when (userState) {
+                        is UIState.Error -> item {
+                            ErrorComponent(errorType = userState.errorType)
+                        }
+
+                        UIState.Loading -> items(5) {
+                            UserShimmer()
+                        }
+
+                        is UIState.Success -> itemsIndexed(userState.data.asList<User>()) { _, item ->
+                            UserComponent(user = item) {
+                                if (viewModel.isLogin) {
+                                    navigate(Navigation.sdmDetail + item.key)
+                                } else {
+                                    showInfoDialog("Anda perlu terdaftar sebagai anggota untuk mengakses informasi detail SDM") {
+                                        navigateToLoginPage()
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-
-        viewModel.loadingState.observe(viewLifecycleOwner) {
-            showLoading(it)
         }
 
         viewModel.onCreate()

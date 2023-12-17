@@ -1,6 +1,8 @@
 package com.jhy.project.schoollibrary.feature.library.pinjam
 
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
+import com.jhy.project.schoollibrary.extension.asList
 import com.jhy.project.schoollibrary.extension.roundUpToNearestThousand
 import com.jhy.project.schoollibrary.extension.toIDRFormat
 import com.jhy.project.schoollibrary.model.PinjamBuku
@@ -9,10 +11,16 @@ import com.jhy.project.schoollibrary.model.adapter.PinjamBukuAdapter
 import com.jhy.project.schoollibrary.model.constant.LiveDataTag
 import com.jhy.project.schoollibrary.model.dipinjam
 import com.jhy.project.schoollibrary.model.selesai
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.loadPinjamBukuList
+import com.jhy.project.schoollibrary.repository.selesaikanPinjamBuku
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,15 +49,28 @@ class PinjamViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMode
         loadPinjam()
     }
 
+    private var pinjamJob: Job? = null
     private fun loadPinjam() {
-        showLoading()
-        db.loadPinjamBukuList(userKey, bookKey, keyword).addOnCompleteListener {
-            if (it.isSuccessful) {
-                pinjamList.clear()
-                pinjamList.addAll(it.result.toObjects(PinjamBuku::class.java))
-                showPinjamAdapter(keyword)
-            } else {
-                dismissLoading()
+        pinjamJob?.cancel()
+        pinjamJob = viewModelScope.launch {
+            observeStatefulCollection<PinjamBuku>(
+                db.loadPinjamBukuList(userKey, bookKey, keyword)
+            ).collect {
+                when (it) {
+                    is FirestoreState.Failed -> {
+                        showLoading(false)
+                    }
+                    is FirestoreState.Loading -> {
+                        showLoading()
+                    }
+                    is FirestoreState.Success -> {
+                        pinjamList.apply {
+                            clear()
+                            addAll(it.data.asList())
+                        }
+                        showPinjamAdapter(keyword)
+                    }
+                }
             }
         }
     }

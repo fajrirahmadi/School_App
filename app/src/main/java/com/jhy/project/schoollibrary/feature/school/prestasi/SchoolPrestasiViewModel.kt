@@ -1,12 +1,18 @@
 package com.jhy.project.schoollibrary.feature.school.prestasi
 
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.model.SchoolPrestasi
 import com.jhy.project.schoollibrary.model.SchoolPrestasiModel
+import com.jhy.project.schoollibrary.model.SchoolProfileModel
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.utils.observeStatefulDoc
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,20 +36,25 @@ class SchoolPrestasiViewModel @Inject constructor(db: FirebaseRepository) : Base
         loadPrestasi()
     }
 
-    private fun loadPrestasi(online: Boolean = false) {
-        showLoading()
-        db.loadSchoolPrestasi(online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result?.toObject(SchoolPrestasiModel::class.java)?.let { model ->
-                    _imageState.value = model.image
-                    updateData(model.items)
+    var schoolJob: Job? = null
+    private fun loadPrestasi() {
+        schoolJob?.cancel()
+        schoolJob = viewModelScope.launch {
+            observeStatefulDoc<SchoolPrestasiModel>(
+                db.loadSchoolPrestasi()
+            ).collect {
+                when (it) {
+                    is FirestoreState.Failed -> postDelayed { showLoading(false) }
+                    is FirestoreState.Loading -> showLoading()
+                    is FirestoreState.Success -> {
+                        it.data?.let { model ->
+                            _imageState.value = model.image
+                            updateData(model.items)
+                        }
+                        postDelayed { showLoading(false) }
+                    }
                 }
             }
-            if (!online) {
-                loadPrestasi(true)
-                return@addOnCompleteListener
-            }
-            postDelayed { showLoading(false) }
         }
     }
 

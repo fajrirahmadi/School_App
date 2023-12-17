@@ -17,7 +17,10 @@ import dagger.hilt.android.AndroidEntryPoint
 const val usersBottomSheet = "users_bottom_sheet"
 
 @AndroidEntryPoint
-class UsersBottomSheet(private val listener: UserListener) :
+class UsersBottomSheet(
+    private val role: String? = null,
+    private val listener: UserListener
+) :
     BaseViewBindingBottomSheet<BottomsheetListBinding>() {
 
     private val viewModel by viewModels<UsersViewModel>()
@@ -37,6 +40,7 @@ class UsersBottomSheet(private val listener: UserListener) :
             true
         }
 
+        viewModel.role = role
         viewModel.loadUserList()
     }
 

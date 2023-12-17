@@ -16,6 +16,7 @@ import com.jhy.project.schoollibrary.databinding.BottomsheetBebasPustakaBinding
 import com.jhy.project.schoollibrary.extension.toDateFormat
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.siswa
+import com.jhy.project.schoollibrary.model.toKelasText
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -35,7 +36,7 @@ class CetakBottomSheet(val user: User, var cetak: String) :
             noTv.text = if (user.role == siswa) "NIS" else "NIP"
             nisValueTv.text = user.no_id
             kelasContainer.isVisible = user.role == siswa
-            kelasValueTv.text = user.kelas?.replace(".", " ")
+            kelasValueTv.text = user.kelas?.toKelasText()
             cetakBtn.setOnClickListener {
                 createBitmap()
             }

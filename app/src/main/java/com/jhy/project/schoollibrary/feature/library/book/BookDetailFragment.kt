@@ -1,7 +1,12 @@
 package com.jhy.project.schoollibrary.feature.library.book
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -55,10 +60,16 @@ class BookDetailFragment : BaseViewBindingFragment<FragmentBookDetailBinding>() 
                         downloadBtn.apply {
                             isVisible = true
                             setOnClickListener {
-                                findNavController().navigate(
-                                    BookDetailFragmentDirections.actionToBookReadPdfFragment(url),
-                                    getNavOptions()
-                                )
+                                when {
+                                    url.contains("drive.google.com") -> {
+                                        openBrowser(url)
+                                    }
+
+                                    else -> findNavController().navigate(
+                                        BookDetailFragmentDirections.actionToBookReadPdfFragment(url),
+                                        getNavOptions()
+                                    )
+                                }
                             }
                         }
                     }
@@ -108,15 +119,29 @@ class BookDetailFragment : BaseViewBindingFragment<FragmentBookDetailBinding>() 
                     return@setOnClickListener
                 }
                 viewModel.bookState.value?.let { book ->
-                    showBottomSheet(
-                        BookCodeSheet {
-                            book.bookCode = it
-                            findNavController().navigate(
-                                BookDetailFragmentDirections.actionToBookPinjamFragment(book),
-                                getNavOptions()
-                            )
-                        }, "book_code"
-                    )
+                    args.code?.let {
+                        book.bookCode = it
+                        findNavController().navigate(
+                            BookDetailFragmentDirections.actionToBookPinjamFragment(
+                                book,
+                                args.paket
+                            ),
+                            getNavOptions()
+                        )
+                    } ?: run {
+                        showBottomSheet(
+                            BookCodeSheet {
+                                book.bookCode = it
+                                findNavController().navigate(
+                                    BookDetailFragmentDirections.actionToBookPinjamFragment(
+                                        book,
+                                        args.paket
+                                    ),
+                                    getNavOptions()
+                                )
+                            }, "book_code"
+                        )
+                    }
                 }
             }
         }
@@ -136,6 +161,14 @@ class BookDetailFragment : BaseViewBindingFragment<FragmentBookDetailBinding>() 
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
+                    R.id.action_stock -> {
+                        showBottomSheet(
+                            StockBottomSheet(book),
+                            "bottom_sheet"
+                        )
+                        true
+                    }
+
                     R.id.action_edit -> {
                         findNavController().navigate(
                             BookDetailFragmentDirections.actionToAddEditBookFragment(
@@ -144,6 +177,7 @@ class BookDetailFragment : BaseViewBindingFragment<FragmentBookDetailBinding>() 
                         )
                         true
                     }
+
                     R.id.action_delete -> {
                         showBottomSheet(
                             ConfirmationBottomSheet("Konfirmasi",

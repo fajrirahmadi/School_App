@@ -13,7 +13,9 @@ import com.jhy.project.schoollibrary.R
 import com.jhy.project.schoollibrary.base.BaseViewBindingActivity
 import com.jhy.project.schoollibrary.databinding.ActivityMainBinding
 import com.jhy.project.schoollibrary.extension.slideFromBottom
+import com.jhy.project.schoollibrary.extension.slideFromTop
 import com.jhy.project.schoollibrary.extension.slideToBottom
+import com.jhy.project.schoollibrary.extension.slideToTop
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -43,8 +45,6 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
             val isTopLevelMenu = bottomMenus.any {
                 it.itemId == destination.id
             }
-            binding.mainToolbarArea.isVisible =
-                !binding.toolbar.title.isNullOrEmpty() && !isTopLevelMenu
 
             binding.toolbar.setNavigationOnClickListener {
                 blockButton()
@@ -54,13 +54,16 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
 
             if (!isTopLevelMenu) {
                 binding.bottomNav.slideToBottom()
+                binding.mainToolbarArea.slideFromTop()
                 if (!binding.toolbar.title.isNullOrEmpty()) {
                     binding.titleTextView.text = binding.toolbar.title.toString()
                 }
             } else {
+                binding.mainToolbarArea.slideToTop()
                 binding.bottomNav.slideFromBottom()
             }
             binding.bottomNav.isVisible = isTopLevelMenu
+            binding.mainToolbarArea.isVisible = !isTopLevelMenu
         }
 
         Firebase.dynamicLinks.getDynamicLink(intent).addOnCompleteListener {

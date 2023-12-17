@@ -1,11 +1,19 @@
 package com.jhy.project.schoollibrary.auth
 
 import android.content.Context
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.constant.LiveDataTag
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.createUser
+import com.jhy.project.schoollibrary.repository.deleteUser
+import com.jhy.project.schoollibrary.repository.loginWithEmailAndPassword
+import com.jhy.project.schoollibrary.repository.sendEmailReset
+import com.jhy.project.schoollibrary.repository.setUser
+import com.jhy.project.schoollibrary.repository.signOut
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,11 +24,14 @@ class AuthViewModel @Inject constructor(
     fun doLoginByEmailAndPassword(email: String, password: String) {
         val mail = if (email.contains("@")) email else "$email@mailinator.com"
         loadingState.value = true
-        db.loginWithEmailAndPassword(mail, password).addOnCompleteListener {
-            requestState.value = Pair(it.isSuccessful, LiveDataTag.login)
-            postDelayed {
-                loadingState.value = false
+        viewModelScope.launch {
+            try {
+                val task = db.loginWithEmailAndPassword(mail, password)
+                requestState.value = Pair(task?.user != null, LiveDataTag.login)
+            } catch (e: Exception) {
+                requestState.value = Pair(false, LiveDataTag.login)
             }
+            postDelayed { showLoading(false) }
         }
     }
 

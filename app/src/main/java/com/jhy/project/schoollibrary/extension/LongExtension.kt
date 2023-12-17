@@ -13,7 +13,7 @@ fun Long.toDotsFormat(): String {
 }
 
 fun Long.toDateFormat(format: String): String {
-    return SimpleDateFormat(format, Locale.getDefault()).format(Date(this))
+    return SimpleDateFormat(format, Locale("id", "ID")).format(Date(this))
 }
 
 fun Long.roundUpToNearestThousand(): Long {
@@ -40,4 +40,22 @@ fun Long.toMoment(): String {
 
 fun Long.isSameDate(other: Long, format: String = "ddMMyyyy"): Boolean {
     return this.toDateFormat(format) == other.toDateFormat(format)
+}
+
+fun Long.isInRange(first: Long, second: Long, format: String = "yyyy-MM-dd"): Boolean {
+    val date = this.toDateFormat(format)
+    val firstDate = if (first < second) first.toDateFormat(format) else second.toDateFormat(format)
+    val secondDate = if (first > second) first.toDateFormat(format) else second.toDateFormat(format)
+    return date in firstDate..secondDate
+}
+
+fun Long.generateDateBetween(other: Long): String {
+    var date = ""
+    var current = this
+    while (current.isInRange(this, other)) {
+        date += current.toDateFormat("yyyy-MM-dd")
+        date += ","
+        current += 24 * 60 * 60 * 1000
+    }
+    return date
 }

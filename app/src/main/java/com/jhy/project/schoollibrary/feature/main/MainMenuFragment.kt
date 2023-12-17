@@ -55,15 +55,6 @@ class MainMenuFragment : BaseViewBindingFragment<FragmentMenuBinding>() {
     }
 
     private fun bindViews() {
-        binding.profileIv.setOnClickListener {
-            if (!viewModel.isLogin) {
-                navigateToLoginPage()
-                return@setOnClickListener
-            }
-            findNavController().navigate(
-                MainMenuFragmentDirections.actionToProfileFragment(), getNavOptions()
-            )
-        }
         binding.bannerRv.initHorizontalAdapter(requireContext(), viewModel.bannerAdapter)
         viewModel.bannerAdapter.onClickListener = { _, _, item, _ ->
             navigate(item.menu)
@@ -85,9 +76,13 @@ class MainMenuFragment : BaseViewBindingFragment<FragmentMenuBinding>() {
         }
         binding.swipeRefresh.setOnRefreshListener {
             binding.swipeRefresh.isRefreshing = false
-            viewModel.onCreate(true)
+            viewModel.onCreate()
         }
         binding.addArticleBtn.setOnClickListener {
+            findNavController().navigate(
+                MainMenuFragmentDirections.actionToAddArticleFragment(),
+                getNavOptions()
+            )
         }
     }
 

@@ -1,14 +1,20 @@
 package com.jhy.project.schoollibrary.feature.school.kbm
 
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.constanta.RemoteConfigHelper
+import com.jhy.project.schoollibrary.extension.asList
 import com.jhy.project.schoollibrary.model.Jadwal
 import com.jhy.project.schoollibrary.model.Kelas
 import com.jhy.project.schoollibrary.model.Mapel
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,18 +49,21 @@ class KBMViewModel @Inject constructor(
         loadKelas()
     }
 
-    private fun loadKelas(online: Boolean = false) {
+    var kelasJob: Job? = null
+    private fun loadKelas() {
         showLoading()
-        db.getKelas(online).addOnCompleteListener {
-            if (it.isSuccessful) {
-                kelasList.clear()
-                kelasList.addAll(it.result.toObjects(Kelas::class.java))
-                updateKelasState(kelasList.map { it.name.uppercase() })
+        kelasJob?.cancel()
+        kelasJob = viewModelScope.launch {
+            observeStatefulCollection<Kelas>(
+                db.getKelas()
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    kelasList.clear()
+                    kelasList.addAll(it.data.asList())
+                    updateKelasState(kelasList.map { it.name.uppercase() })
+                }
+                postDelayed { showLoading(false) }
             }
-            if (!online) {
-                loadKelas(true)
-            }
-            postDelayed { showLoading(false) }
         }
     }
 
@@ -77,12 +86,19 @@ class KBMViewModel @Inject constructor(
         }
     }
 
+    var mapelJob: Job? = null
     private fun loadMapelByKelas(kelas: String) {
         val currentYear = config.currentSchoolYear().replace("/", "_")
         val filter = "${currentYear}_$kelas".lowercase()
-        db.loadMapelByKelas(filter).addOnCompleteListener {
-            if (it.isSuccessful) {
-                _mapelListState.value = it.result.toObjects(Mapel::class.java)
+
+        mapelJob?.cancel()
+        mapelJob = viewModelScope.launch {
+            observeStatefulCollection<Mapel>(
+                db.loadMapelByKelas(filter)
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    _mapelListState.value = it.data.asList()
+                }
             }
         }
     }
@@ -92,14 +108,20 @@ class KBMViewModel @Inject constructor(
         loadJadwal()
     }
 
+    var jadwalJob: Job? = null
     private fun loadJadwal() {
         val day = days[_daySelectedState.value]
         val kelas = _kelasSelectedState.value
         val filter = "${tahunAjaran}_${day}_${kelas}"
 
-        db.loadJadwalByFilter(filter).addOnCompleteListener {
-            if (it.isSuccessful) {
-                updateJadwalState(it.result.toObjects(Jadwal::class.java))
+        jadwalJob?.cancel()
+        jadwalJob = viewModelScope.launch {
+            observeStatefulCollection<Jadwal>(
+                db.loadJadwalByFilter(filter)
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    updateJadwalState(it.data.asList())
+                }
             }
         }
     }

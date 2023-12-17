@@ -3,7 +3,8 @@ package com.jhy.project.schoollibrary.extension
 import java.util.*
 
 val currentDateMillis = System.currentTimeMillis()
-const val sevenDay = 7 * 3600 * 1000
+const val sevenDay = 7 * 24 * 3600 * 1000L
+const val halfYear = 178 * 24 * 3600 * 1000L
 
 fun getCurrentYear(): Int {
     return Calendar.getInstance().timeInMillis.toDateFormat("yyyy").toInt()

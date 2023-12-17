@@ -1,15 +1,20 @@
 package com.jhy.project.schoollibrary.feature.school.schoolprofile
 
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.extension.capitalizeWord
 import com.jhy.project.schoollibrary.model.SchoolProfileModel
 import com.jhy.project.schoollibrary.model.SchoolProfile
 import com.jhy.project.schoollibrary.model.adapter.FilterCustomAdapter
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.utils.observeStatefulDoc
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,22 +32,27 @@ class SchoolProfileViewModel @Inject constructor(db: FirebaseRepository) : BaseV
     val adapter = FastItemAdapter<FilterCustomAdapter>()
     var selectedPage: Int = 0
 
-    fun onCreate(online: Boolean = false) {
-        loadSchoolProfile(online)
+    fun onCreate() {
+        loadSchoolProfile()
     }
 
-    private fun loadSchoolProfile(online: Boolean = false) {
+    var schoolJob: Job? = null
+    private fun loadSchoolProfile() {
         showLoading()
-        db.loadSchoolProfile(online).addOnCompleteListener {
-            if (it.isSuccessful && it.result.exists()) {
-                it.result.toObject(SchoolProfileModel::class.java)?.let { model ->
-                    initSchoolProfile(model)
+        schoolJob?.cancel()
+        schoolJob = viewModelScope.launch {
+            observeStatefulDoc<SchoolProfileModel>(
+                db.loadSchoolProfile()
+            ).collect {
+                when (it) {
+                    is FirestoreState.Failed -> postDelayed { showLoading(false) }
+                    is FirestoreState.Loading -> showLoading()
+                    is FirestoreState.Success -> {
+                        it.data?.let { model -> initSchoolProfile(model) }
+                        postDelayed { showLoading(false) }
+                    }
                 }
             }
-            if (!online) {
-                loadSchoolProfile(true)
-            }
-            postDelayed { showLoading(false) }
         }
     }
 

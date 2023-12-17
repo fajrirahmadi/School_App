@@ -16,15 +16,26 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/kelas_tv"
+        style="@style/workSansRegular"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp"
+        android:text="Kelas: VII 1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nama_tv" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/id_tv"
         style="@style/workSansRegular"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:text="NIS: 19250"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nama_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/kelas_tv" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/detail_btn"

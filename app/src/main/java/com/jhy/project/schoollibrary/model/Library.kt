@@ -7,7 +7,8 @@ data class Visitor(
     var nis: String = "",
     var gender: String = "",
     var date: Long = System.currentTimeMillis(),
-    var createdBy: String = admin
+    var createdBy: String = admin,
+    var userKey: String? = null
 )
 
 data class VisitCount(

@@ -12,4 +12,7 @@ object Navigation {
     const val addEditBook = host + "home/library/book/add-edit?title="
 
     const val presenceFragment = host + "activity/presence"
+    const val bookPackagePage = host + "home/library/book-package"
+
+    const val sdmDetail = host + "home/sdm/detail?key="
 }

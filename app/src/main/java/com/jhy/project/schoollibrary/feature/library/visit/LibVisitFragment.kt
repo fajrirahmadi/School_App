@@ -77,7 +77,7 @@ class LibVisitFragment : BaseComposeFragment() {
                             modifier = Modifier.weight(1f),
                             text = "Cari Daftar"
                         ) {
-                            showBottomSheet(UsersBottomSheet(object : UserListener {
+                            showBottomSheet(UsersBottomSheet(null, object : UserListener {
                                 override fun pickUser(user: User) {
                                     viewModel.submitVisitor(user)
                                 }

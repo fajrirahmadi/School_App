@@ -3,7 +3,9 @@ package com.jhy.project.schoollibrary.feature.activity.presence
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
+import com.jhy.project.schoollibrary.extension.asList
 import com.jhy.project.schoollibrary.model.Absence
 import com.jhy.project.schoollibrary.model.Mapel
 import com.jhy.project.schoollibrary.model.NIS
@@ -11,10 +13,16 @@ import com.jhy.project.schoollibrary.model.Presence
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.constant.Result
 import com.jhy.project.schoollibrary.model.siswa
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.loadUserListByRoleAndClass
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
+import com.jhy.project.schoollibrary.utils.observeStatefulDoc
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,30 +61,45 @@ class PresenceViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMo
         }
     }
 
+    private var absenceJob: Job? = null
     private fun loadAbsence(key: String) {
         showLoading()
-        db.loadAbsenceByKey(key).addOnCompleteListener {
-            if (it.isSuccessful) {
-                it.result.toObject(Absence::class.java)?.let {
-                    pertemuanText = it.pertemuan
-                    jurnalText = it.jurnal
-                    presenceState = it.absence
+        absenceJob?.cancel()
+        absenceJob = viewModelScope.launch {
+            observeStatefulDoc<Absence>(
+                db.loadAbsenceByKey(key)
+            ).collect {
+                when (it) {
+                    is FirestoreState.Failed -> showLoading(false)
+                    is FirestoreState.Loading -> showLoading()
+                    is FirestoreState.Success -> {
+                        it.data?.let { absence ->
+                            pertemuanText = absence.pertemuan
+                            jurnalText = absence.jurnal
+                            presenceState = absence.absence
+                        }
+                    }
                 }
+                loadSiswaByKelas()
             }
-            loadSiswaByKelas()
         }
     }
 
+    var siswaJob: Job? = null
     private fun loadSiswaByKelas() {
         showLoading()
         val kelasParams = kelas.split("_").lastOrNull() ?: ""
-        db.loadUserListByRoleAndClass(siswa, kelasParams)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    siswaState = it.result.toObjects(User::class.java)
+        siswaJob?.cancel()
+        siswaJob = viewModelScope.launch {
+            observeStatefulCollection<User>(
+                db.loadUserListByRoleAndClass(siswa, kelasParams)
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    siswaState = it.data.asList()
                 }
-                postDelayed { dismissLoading() }
+                postDelayed { showLoading(false) }
             }
+        }
     }
 
     fun updatePresence(noId: String?, presence: Presence) {

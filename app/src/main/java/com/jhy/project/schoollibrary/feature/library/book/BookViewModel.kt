@@ -3,16 +3,37 @@ package com.jhy.project.schoollibrary.feature.library.book
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
-import com.jhy.project.schoollibrary.extension.*
-import com.jhy.project.schoollibrary.model.*
+import com.jhy.project.schoollibrary.extension.allowNewLine
+import com.jhy.project.schoollibrary.extension.asList
+import com.jhy.project.schoollibrary.extension.compressImage
+import com.jhy.project.schoollibrary.extension.createFileFromUri
+import com.jhy.project.schoollibrary.extension.generateKeyword
+import com.jhy.project.schoollibrary.extension.halfYear
+import com.jhy.project.schoollibrary.extension.sevenDay
+import com.jhy.project.schoollibrary.extension.showToast
+import com.jhy.project.schoollibrary.model.Book
+import com.jhy.project.schoollibrary.model.PinjamBuku
+import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.adapter.BookAdapter
 import com.jhy.project.schoollibrary.model.adapter.KeyValueAdapter
 import com.jhy.project.schoollibrary.model.constant.LiveDataTag
+import com.jhy.project.schoollibrary.model.dipinjam
+import com.jhy.project.schoollibrary.model.state.FirestoreState
+import com.jhy.project.schoollibrary.model.toBookCategory
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.loadBook
+import com.jhy.project.schoollibrary.repository.loadPinjamBukuList
+import com.jhy.project.schoollibrary.repository.submitBook
+import com.jhy.project.schoollibrary.repository.submitPinjam
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
+import com.jhy.project.schoollibrary.utils.observeStatefulDoc
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +42,7 @@ class BookViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
     var userPinjam: User? = null
     var datePinjam: Long = System.currentTimeMillis()
     var dateReturn: Long = System.currentTimeMillis() + sevenDay
+    var isPaket: Boolean = false
 
     private val _bookAdapter = ItemAdapter<BookAdapter>()
     val bookAdapter by lazy {
@@ -50,7 +72,7 @@ class BookViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
             }
             showLoading()
             book.isbn?.let {
-                db.getBookByISBN(it).addOnCompleteListener {
+                db.getBookByISBN(it).get().addOnCompleteListener {
                     if (it.isSuccessful && !it.result.isEmpty) {
                         showInfoDialog(context, "Anda telah mengupload buku ini")
                         dismissLoading()
@@ -93,14 +115,31 @@ class BookViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
         }
     }
 
+    var bookJob: Job? = null
     fun loadBook(key: String) {
-        showLoading(bookState.value == null)
-        db.loadBook(key).addOnCompleteListener {
-            bookState.value = it.result?.toObject(Book::class.java)
-            bookState.value?.let {
-                showBookDetail(it)
+        bookJob?.cancel()
+        bookJob = viewModelScope.launch {
+            observeStatefulDoc<Book>(
+                db.loadBook(key)
+            ).collect {
+                when (it) {
+                    is FirestoreState.Failed -> {
+                        showLoading(false)
+                    }
+
+                    is FirestoreState.Loading -> {
+                        showLoading()
+                    }
+
+                    is FirestoreState.Success -> {
+                        bookState.value = it.data
+                        bookState.value?.let {
+                            showBookDetail(it)
+                        }
+                        postDelayed { showLoading(false) }
+                    }
+                }
             }
-            postDelayed { dismissLoading() }
         }
     }
 
@@ -121,22 +160,34 @@ class BookViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
         }
         _bookDetailAdapter.add(KeyValueAdapter("ISBN", book.isbn?.ifBlank { "-" }))
         _bookDetailAdapter.add(KeyValueAdapter("Stok Buku", book.stock.toString()))
-        db.loadPinjamBukuList(bookKey = book.key).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val size = it.result.toObjects(PinjamBuku::class.java)
-                    .filter { it.status == dipinjam }.size
-                val stock = book.stock - size
-                stockState.value = stock
-                _bookDetailAdapter.add(
-                    KeyValueAdapter(
-                        "Stok Tersisa",
-                        stock.toString()
+
+        val availableStock = book.stock - book.dipinjam
+        _bookDetailAdapter.add(
+            KeyValueAdapter("Stok tersisa", availableStock.toString())
+        )
+        stockState.value = availableStock
+        bookDetailAdapter.notifyAdapterDataSetChanged()
+        loadBookPinjam(book.key, book.stock)
+    }
+
+    private var bookPinjamJob: Job? = null
+    private fun loadBookPinjam(key: String?, stock: Int) {
+        bookPinjamJob?.cancel()
+        bookPinjamJob = viewModelScope.launch {
+            observeStatefulCollection<PinjamBuku>(
+                db.loadPinjamBukuList(bookKey = key)
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    val size = it.data.asList<PinjamBuku>().filter { it.status == dipinjam }.size
+                    val availableStock = stock - size
+                    stockState.value = availableStock
+                    _bookDetailAdapter.add(
+                        KeyValueAdapter("Stok tersisa", availableStock.toString())
                     )
-                )
-                bookDetailAdapter.notifyAdapterDataSetChanged()
+                    bookDetailAdapter.notifyAdapterDataSetChanged()
+                }
             }
         }
-        bookDetailAdapter.notifyAdapterDataSetChanged()
     }
 
     fun addBook(book: Book) {
@@ -189,6 +240,11 @@ class BookViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel(
                 dismissLoading()
             }
         }
+    }
+
+    fun setAsPaket(isPaket: Boolean) {
+        this.isPaket = isPaket
+        if (isPaket) dateReturn = System.currentTimeMillis() + halfYear
     }
 
 }

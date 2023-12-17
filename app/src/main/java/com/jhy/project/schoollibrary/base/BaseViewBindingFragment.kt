@@ -2,6 +2,7 @@ package com.jhy.project.schoollibrary.base
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -10,6 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -99,8 +103,10 @@ abstract class BaseViewBindingFragment<B : ViewBinding> : Fragment() {
     }
 
     protected open fun getNavOptions(): NavOptions? {
-        return NavOptions.Builder().setEnterAnim(R.anim.enter_from_right)
-            .setExitAnim(R.anim.exit_to_left).setPopEnterAnim(R.anim.exit_to_right)
+        return NavOptions.Builder()
+            .setEnterAnim(R.anim.enter_from_right)
+            .setExitAnim(R.anim.exit_to_left)
+            .setPopEnterAnim(R.anim.exit_to_right)
             .setPopExitAnim(R.anim.enter_from_left).build()
     }
 
@@ -137,12 +143,45 @@ abstract class BaseViewBindingFragment<B : ViewBinding> : Fragment() {
         }
     }
 
-    fun showInfoDialog(context: Context, description: String, action: (() -> Unit)? = null) {
+    fun showInfoDialog(context: Context = requireContext(), description: String, action: (() -> Unit)? = null) {
         infoDialog.show(context, "Info", description, action)
     }
 
     fun dismissInfoDialog() {
         infoDialog.dismiss()
+    }
+
+    fun openBrowser(url: String) {
+        val packageName = "com.android.chrome";
+        val builder = CustomTabsIntent.Builder()
+        val params = CustomTabColorSchemeParams.Builder()
+        params.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.primary_color))
+        builder.setDefaultColorSchemeParams(params.build())
+        builder.setShowTitle(false)
+        builder.setShareState(CustomTabsIntent.SHARE_STATE_ON)
+        builder.setInstantAppsEnabled(true)
+        val customBuilder = builder.build()
+        if (requireContext().isPackageInstalled(packageName)) {
+            customBuilder.intent.setPackage(packageName)
+            customBuilder.launchUrl(requireContext(), Uri.parse(url))
+        } else {
+            try {
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data = Uri.parse(url)
+                startActivity(i)
+            } catch (e: Exception) {
+                showInfoDialog(description = "Failed to open the url")
+            }
+        }
+    }
+
+    private fun Context.isPackageInstalled(packageName: String): Boolean {
+        return try {
+            packageManager.getPackageInfo(packageName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
     }
 
     fun showWeb(url: String) {

@@ -9,12 +9,12 @@ import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.extension.capitalizeWord
 import com.jhy.project.schoollibrary.extension.compressImage
 import com.jhy.project.schoollibrary.extension.createFileFromUri
-import com.jhy.project.schoollibrary.model.ProfileMenu
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.adapter.ProfileMenuAdapter
 import com.jhy.project.schoollibrary.model.guru
 import com.jhy.project.schoollibrary.model.siswa
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.repository.signOut
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,11 +46,17 @@ class ProfileViewModel @Inject constructor(db: FirebaseRepository) : BaseViewMod
 
         val id = when (user.role) {
             siswa -> "NIS"
-            guru -> "NIP"
+            guru -> if (user.no_id.isNullOrEmpty()) "NIK" else "NIP"
             else -> "No. ID"
         }
         infoList.add(Pair("Role", user.role.capitalizeWord()))
-        infoList.add(Pair(id, user.no_id ?: " - "))
+        infoList.add(
+            Pair(
+                id,
+                if (user.no_id.isNullOrEmpty()) user.nik ?: " - "
+                else user.no_id ?: " - "
+            )
+        )
         infoList.add(
             Pair(
                 "Tempat/Tanggal Lahir",

@@ -33,7 +33,7 @@ class AuthActivity : BaseViewBindingActivity<ActivityAuthenticationBinding>() {
                 }
                 binding.authTitleTextView.text = title?.toString()
             }
-            binding.contailer.isVisible = binding.authTitleTextView.string.trim().isNotEmpty()
+            binding.contailer.isVisible = binding.authTitleTextView.string.isNotEmpty()
         }
     }
 

@@ -8,7 +8,15 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -17,6 +25,9 @@ import com.jhy.project.schoollibrary.auth.AuthActivity
 import com.jhy.project.schoollibrary.component.InfoDialog
 import com.jhy.project.schoollibrary.component.LoadingDialog
 import com.jhy.project.schoollibrary.component.WebViewActivity
+import com.jhy.project.schoollibrary.component.compose.VerticalSpace
+import com.jhy.project.schoollibrary.component.compose.WorkSandButtonMedium
+import com.jhy.project.schoollibrary.component.compose.WorkSandTextMedium
 import com.jhy.project.schoollibrary.model.constant.Constant
 
 open class BaseComposeFragment : Fragment() {
@@ -93,5 +104,24 @@ open class BaseComposeFragment : Fragment() {
         intent.putExtra(Constant.URL, url)
         startActivity(intent)
         requireActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+    }
+
+    @Composable
+    fun NonLoginComponent(modifier: Modifier = Modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            WorkSandTextMedium(
+                text = "Untuk mengakses halaman ini, Anda harus terdaftar sebagai guru/pegawai SMPN 1 Painan"
+            )
+            VerticalSpace(height = 16.dp)
+            WorkSandButtonMedium(text = "Masuk") {
+                navigateToLoginPage()
+            }
+        }
     }
 }

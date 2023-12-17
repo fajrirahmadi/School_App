@@ -7,14 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.jhy.project.schoollibrary.base.BaseViewModel
 import com.jhy.project.schoollibrary.component.compose.calendar.CalendarState
 import com.jhy.project.schoollibrary.component.compose.calendar.getDates
+import com.jhy.project.schoollibrary.extension.asList
+import com.jhy.project.schoollibrary.extension.generateDateBetween
 import com.jhy.project.schoollibrary.extension.isDateSameAs
-import com.jhy.project.schoollibrary.extension.isSameDate
+import com.jhy.project.schoollibrary.extension.isInRange
 import com.jhy.project.schoollibrary.extension.toDateFormat
 import com.jhy.project.schoollibrary.model.Event
 import com.jhy.project.schoollibrary.model.admin
+import com.jhy.project.schoollibrary.model.state.FirestoreState
 import com.jhy.project.schoollibrary.repository.FirebaseRepository
+import com.jhy.project.schoollibrary.utils.observeStatefulCollection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -48,7 +53,7 @@ class EventViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel
     private fun checkAvailableEvent() {
         val selectedDate = calendarState.selectedDate?.time ?: 0L
         eventListState = events.filter {
-            it.startDate.isSameDate(selectedDate) || it.endDate.isSameDate(selectedDate)
+            selectedDate.isInRange(it.startDate, it.endDate)
         }
     }
 
@@ -102,19 +107,26 @@ class EventViewModel @Inject constructor(db: FirebaseRepository) : BaseViewModel
         loadEventByMonth(calendar.timeInMillis.toDateFormat("yyyy-MM"))
     }
 
+    var eventJob: Job? = null
     private fun loadEventByMonth(filter: String) {
         isLoading = true
-        db.loadEventMyMonth(filter).addOnCompleteListener {
-            if (it.isSuccessful) {
-                events = it.result.toObjects(Event::class.java)
-                calendarState = calendarState.copy(
-                    events = events.map { event ->
-                        event.startDate.toDateFormat("yyyy-MM-dd")
-                    }
-                )
-                checkAvailableEvent()
+        eventJob?.cancel()
+        eventJob = viewModelScope.launch {
+            observeStatefulCollection<Event>(
+                db.loadEventMyMonth(filter)
+            ).collect {
+                if (it is FirestoreState.Success) {
+                    events = it.data.asList<Event>().toMutableList()
+                    calendarState = calendarState.copy(
+                        events = events.joinToString(",") { event ->
+                            event.startDate.generateDateBetween(event.endDate)
+                        }
+                    )
+                    checkAvailableEvent()
+                }
+                isLoading = false
+                postDelayed { showLoading(false) }
             }
-            postDelayed { isLoading = false }
         }
     }
 }

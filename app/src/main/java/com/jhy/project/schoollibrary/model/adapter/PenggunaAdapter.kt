@@ -9,6 +9,8 @@ import com.jhy.project.schoollibrary.databinding.AdapterUserBinding
 import com.jhy.project.schoollibrary.model.User
 import com.jhy.project.schoollibrary.model.admin
 import com.jhy.project.schoollibrary.model.guru
+import com.jhy.project.schoollibrary.model.siswa
+import com.jhy.project.schoollibrary.model.toKelasText
 import com.mikepenz.fastadapter.binding.AbstractBindingItem
 
 data class PenggunaAdapter(
@@ -32,9 +34,13 @@ data class PenggunaAdapter(
         super.bindView(binding, payloads)
         binding.apply {
             namaTv.text = user.name
+            kelasTv.apply {
+                isVisible = user.role == siswa
+                text = user.kelas?.toKelasText()
+            }
             idTv.text = when (user.role) {
                 admin -> "Admin"
-                guru -> "NIP: ${user.no_id}"
+                guru -> "NIK: ${user.nik}"
                 else -> "NIS: ${user.no_id}"
             }
             detailBtn.isVisible = showDetail
